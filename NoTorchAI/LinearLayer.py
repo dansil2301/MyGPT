@@ -17,7 +17,7 @@ class Linear:
 
     def backward(self, icoming_grad: np.ndarray) -> np.array:
         self.d_weights = self.input.T @ icoming_grad
-        self.d_bias = np.sum(icoming_grad, axis=-1)
+        self.d_bias = np.sum(icoming_grad, axis=0)
 
         outgoing_grad = icoming_grad @ self.weights.T
         return outgoing_grad
