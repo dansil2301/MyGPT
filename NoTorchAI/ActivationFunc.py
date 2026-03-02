@@ -1,9 +1,9 @@
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 
 import numpy as np
 
 
-class ActivationFunc(abs):
+class ActivationFunc(ABC):
     @abstractmethod
     def forward(self, x: np.ndarray) -> np.ndarray:
         pass
@@ -25,8 +25,8 @@ class Softmax(ActivationFunc):
 
         return self.output
 
-    def backward(self, icoming_grad: np.ndarray) -> np.ndarray:
-        dot = np.sum(self.output * icoming_grad, axis=-1, keepdims=True)
-        outgoing_grad = self.output * (icoming_grad - dot)
+    def backward(self, incoming_grad: np.ndarray) -> np.ndarray:
+        dot = np.sum(self.output * incoming_grad, axis=-1, keepdims=True)
+        outgoing_grad = self.output * (incoming_grad - dot)
 
         return outgoing_grad
