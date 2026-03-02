@@ -16,6 +16,9 @@ class SelfAttention:
         self.scores = np.array()
         self.softmax = Softmax()
 
+        self.attention = None
+        self.output = None
+
     def _mask_fill(self, tensor: np.ndarray):
         B, T, _ = tensor.shape
 
@@ -34,9 +37,25 @@ class SelfAttention:
         self.scores = (self.q_output @ self.k_output.transpose(-2, -1)) / (E ** 0.5)
 
         masked_scores = self._mask_fill(self.scores)
-        attention = self.softmax.forward(masked_scores)
+        self.attention = self.softmax.forward(masked_scores)
 
-        return np.matmul(attention, self.v_output)
+        return np.matmul(self.attention, self.v_output)
     
     def backward(self, incoming_grad: np.array):
-        pass
+        B, T, E = incoming_grad.shape
+
+        dvalue = self.attention.transpose(-2, -1) @ incoming_grad
+        dattention = incoming_grad @ self.v_output.transpose(-2, -1)
+
+        dsoftmax = self.softmax.backward(dattention)
+        dscaling = dsoftmax / (E ** 0.5)
+
+        dquery = dscaling @ self.k_output
+        dkey = dscaling.transpose(-2, -1) @ self.q_output
+
+        dx_v = self.value.backward(dvalue)
+        dx_q = self.query.backward(dquery)
+        dx_k = self.key.backward(dkey)
+
+        return dx_v + dx_q + dx_k
+

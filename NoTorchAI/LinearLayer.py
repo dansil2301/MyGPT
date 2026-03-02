@@ -11,11 +11,11 @@ class Linear:
         self.d_weights = None
         self.d_bias = None
 
-    def forward(self, x: np.array):
+    def forward(self, x: np.ndarray) -> np.ndarray:
         self.input = x
         return x @ self.weights + self.bias
 
-    def backward(self, icoming_grad: np.ndarray) -> np.array:
+    def backward(self, icoming_grad: np.ndarray) -> np.ndarray:
         self.d_weights = self.input.T @ icoming_grad
         self.d_bias = np.sum(icoming_grad, axis=0)
 
