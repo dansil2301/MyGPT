@@ -4,8 +4,8 @@ from numpy.random import default_rng
 
 class Linear:
     def __init__(self, in_feature: int, out_feature: int):
-        self.weights = default_rng(2).random((in_feature, out_feature))
-        self.bias = default_rng(1).random(out_feature)
+        self.weights = default_rng(42).random((in_feature, out_feature))
+        self.bias = default_rng(43).random(out_feature)
 
         self.input = None
         self.d_weights = None
