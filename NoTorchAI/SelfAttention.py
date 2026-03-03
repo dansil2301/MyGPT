@@ -58,4 +58,3 @@ class SelfAttention:
         dx_k = self.key.backward(dkey)
 
         return dx_v + dx_q + dx_k
-
