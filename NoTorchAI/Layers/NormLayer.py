@@ -10,17 +10,20 @@ class Normalization:
 
         self.x_hat = None
         self.mean = None
-        self.varience = None
+        self.variance = None
+
+        self.dbeta = None
+        self.dgamma = None
 
     def forward(self, x: np.ndarray) -> np.ndarray:
         self.mean = np.mean(x, axis=-1, keepdims=True)
-        self.varience = x.var(axis=-1, keepdims=True) + self.epsilon
-        self.x_hat = (x - self.mean) / (self.varience ** 0.5)
+        self.variance = x.var(axis=-1, keepdims=True) + self.epsilon
+        self.x_hat = (x - self.mean) / (self.variance ** 0.5)
         return self.gamma * self.x_hat + self.beta
 
     def backward(self, incoming_grad: np.ndarray) -> np.ndarray:
-        dbeta = np.sum(incoming_grad, axis=(0, 1))
-        dgamma = np.sum(incoming_grad * self.x_hat, axis=(0, 1))
+        self.dbeta = np.sum(incoming_grad, axis=(0, 1))
+        self.dgamma = np.sum(incoming_grad * self.x_hat, axis=(0, 1))
 
         dx_hat = incoming_grad * self.gamma
         N = self.x_hat.shape[-1]
@@ -34,5 +37,5 @@ class Normalization:
             - sum_dxhat
             - self.x_hat * sum_dxhat_xhat
         )
-        
+
         return dx

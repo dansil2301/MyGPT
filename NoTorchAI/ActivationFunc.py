@@ -30,3 +30,16 @@ class Softmax(ActivationFunc):
         outgoing_grad = self.output * (incoming_grad - dot)
 
         return outgoing_grad
+    
+
+class ReLu(ActivationFunc):
+    def __init__(self):
+        self.output = None
+
+    def forward(self, x):
+        self.output = np.maximum(x, 0)
+        return self.output
+    
+    def backward(self, icoming_grad):
+        mask = (self.output > 0)
+        return mask * icoming_grad

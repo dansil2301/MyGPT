@@ -1,6 +1,6 @@
 import numpy as np
 from NoTorchAI.ActivationFunc import Softmax
-from NoTorchAI.LinearLayer import Linear
+from NoTorchAI.Layers.LinearLayer import Linear
 
 
 class SelfAttention:
