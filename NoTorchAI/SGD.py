@@ -1,0 +1,21 @@
+from abc import ABC, abstractmethod
+
+from NoTorchAI.Layers.ABSLayer import ABSLayer
+
+
+class ABSGradient(ABC):
+    def __init__(self):
+        pass
+
+    @abstractmethod
+    def step(self, layer: ABSLayer) -> None:
+        pass
+
+
+class SGD(ABSGradient):
+    def __init__(self, lr: float):
+        self.lr = lr
+
+    def step(self, layer: ABSLayer) -> None:
+        layer.weights -= self.lr * layer.d_weights
+        layer.bias    -= self.lr * layer.d_bias

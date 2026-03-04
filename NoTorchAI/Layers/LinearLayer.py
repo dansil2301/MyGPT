@@ -1,8 +1,10 @@
 import numpy as np
 from numpy.random import default_rng
 
+from NoTorchAI.Layers.ABSLayer import ABSLayer
 
-class Linear:
+
+class Linear(ABSLayer):
     def __init__(self, in_feature: int, out_feature: int):
         self.weights = default_rng(42).random((in_feature, out_feature))
         self.bias = default_rng(43).random(out_feature)

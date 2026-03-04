@@ -1,10 +1,13 @@
 import numpy as np
 from NoTorchAI.ActivationFunc import Softmax
 from NoTorchAI.Layers.LinearLayer import Linear
+from NoTorchAI.SGD import ABSGradient
 
 
 class SelfAttention:
-    def __init__(self, d_model: int):
+    def __init__(self, d_model: int, gradient_technic: ABSGradient):
+        self.gradient_technic = gradient_technic
+
         self.query = Linear(d_model, d_model)
         self.key = Linear(d_model, d_model)
         self.value = Linear(d_model, d_model)
@@ -26,6 +29,11 @@ class SelfAttention:
         mask = mask[None, :, :]
         tensor = np.where(mask, -np.inf, tensor)
         return tensor
+    
+    def _change_weights(self):
+        self.gradient_technic(self.query)
+        self.gradient_technic(self.key)
+        self.gradient_technic(self.value)
 
     def forward(self, x: np.array):
         B, T, E = x.shape
@@ -57,4 +65,5 @@ class SelfAttention:
         dx_q = self.query.backward(dquery)
         dx_k = self.key.backward(dkey)
 
+        self._change_weights()
         return dx_v + dx_q + dx_k
