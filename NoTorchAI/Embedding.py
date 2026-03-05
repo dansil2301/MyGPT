@@ -3,8 +3,8 @@ from numpy.random import default_rng
 
 
 class Embedding:
-    def __init__(self, vocabulary: int, d_model: int):
-        self.embeddings = default_rng(45).random((vocabulary, d_model))
+    def __init__(self, num_embedding: int, d_model: int):
+        self.embeddings = default_rng(45).random((num_embedding, d_model))
 
         self.input_indices = None
         self.d_embeddings = None
