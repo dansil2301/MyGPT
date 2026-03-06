@@ -10,6 +10,8 @@ class ABSLayer(ABC):
         self.d_weights = None
         self.d_bias = None
 
+        self.grad = None
+
     @abstractmethod
     def forward(self, x: np.ndarray) -> np.ndarray:
         pass

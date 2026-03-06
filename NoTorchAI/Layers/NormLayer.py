@@ -6,9 +6,9 @@ from NoTorchAI.Layers.ABSLayer import ABSLayer
 
 class Normalization(ABSLayer):
     def __init__(self, d_model: int):
-        self.weights = default_rng(43).random(d_model)
-        self.bias = default_rng(42).random(d_model)
-        self.epsilon = 1e-8
+        self.weights = np.ones(d_model)
+        self.bias = np.zeros(d_model)
+        self.epsilon = 1e-5
 
         self.x_hat = None
         self.mean = None

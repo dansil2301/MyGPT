@@ -1,7 +1,7 @@
 import numpy as np
 from NoTorchAI.ActivationFunc import Softmax
 from NoTorchAI.Layers.LinearLayer import Linear
-from NoTorchAI.SGD import ABSGradient
+from NoTorchAI.SGD import SGD, ABSGradient
 
 
 class SelfAttention:
@@ -56,6 +56,7 @@ class SelfAttention:
         dattention = incoming_grad @ self.v_output.transpose(0, 2, 1)
 
         dsoftmax = self.softmax.backward(dattention)
+
         dscaling = dsoftmax / (E ** 0.5)
 
         dquery = dscaling @ self.k_output

@@ -6,8 +6,10 @@ from NoTorchAI.Layers.ABSLayer import ABSLayer
 
 class Linear(ABSLayer):
     def __init__(self, in_feature: int, out_feature: int):
-        self.weights = default_rng(42).random((in_feature, out_feature))
-        self.bias = default_rng(43).random(out_feature)
+        rng = default_rng()
+
+        self.weights = rng.normal(0, 0.02, (in_feature, out_feature))
+        self.bias =  np.zeros(out_feature)
 
         self.input = None
         self.d_weights = None
@@ -17,9 +19,10 @@ class Linear(ABSLayer):
         self.input = x
         return x @ self.weights + self.bias
 
-    def backward(self, icoming_grad: np.ndarray) -> np.ndarray:
-        self.d_weights = np.sum(self.input.transpose(0, 2, 1) @ icoming_grad, axis=0)
-        self.d_bias = np.sum(icoming_grad, axis=0)
+    def backward(self, incoming_grad: np.ndarray) -> np.ndarray:
+        self.grad = incoming_grad
+        self.d_weights = np.sum(self.input.transpose(0, 2, 1) @ incoming_grad, axis=0)
+        self.d_bias = np.sum(incoming_grad, axis=(0, 1))
 
-        outgoing_grad = icoming_grad @ self.weights.T
+        outgoing_grad = incoming_grad @ self.weights.T
         return outgoing_grad

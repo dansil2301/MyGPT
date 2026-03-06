@@ -34,12 +34,11 @@ class Softmax(ActivationFunc):
 
 class ReLu(ActivationFunc):
     def __init__(self):
-        self.output = None
+        self.mask = None
 
     def forward(self, x):
-        self.output = np.maximum(x, 0)
-        return self.output
-    
-    def backward(self, icoming_grad):
-        mask = (self.output > 0)
-        return mask * icoming_grad
+        self.mask = (x > 0)  # store mask directly
+        return np.where(self.mask, x, 0)
+
+    def backward(self, incoming_grad):
+        return self.mask * incoming_grad
