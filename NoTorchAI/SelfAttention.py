@@ -16,7 +16,7 @@ class SelfAttention:
         self.k_output = None
         self.v_output = None
 
-        self.scores = np.array()
+        self.scores = None
         self.softmax = Softmax()
 
         self.attention = None
@@ -31,9 +31,9 @@ class SelfAttention:
         return tensor
     
     def _change_weights(self):
-        self.gradient_technic(self.query)
-        self.gradient_technic(self.key)
-        self.gradient_technic(self.value)
+        self.gradient_technic.step(self.query)
+        self.gradient_technic.step(self.key)
+        self.gradient_technic.step(self.value)
 
     def forward(self, x: np.array):
         B, T, E = x.shape
@@ -42,7 +42,7 @@ class SelfAttention:
         self.k_output = self.key.forward(x)
         self.v_output = self.value.forward(x)
 
-        self.scores = (self.q_output @ self.k_output.transpose(-2, -1)) / (E ** 0.5)
+        self.scores = (self.q_output @ self.k_output.transpose(0, 2, 1)) / (E ** 0.5)
 
         masked_scores = self._mask_fill(self.scores)
         self.attention = self.softmax.forward(masked_scores)
@@ -52,14 +52,14 @@ class SelfAttention:
     def backward(self, incoming_grad: np.array):
         B, T, E = incoming_grad.shape
 
-        dvalue = self.attention.transpose(-2, -1) @ incoming_grad
-        dattention = incoming_grad @ self.v_output.transpose(-2, -1)
+        dvalue = self.attention.transpose(0, 2, 1) @ incoming_grad
+        dattention = incoming_grad @ self.v_output.transpose(0, 2, 1)
 
         dsoftmax = self.softmax.backward(dattention)
         dscaling = dsoftmax / (E ** 0.5)
 
         dquery = dscaling @ self.k_output
-        dkey = dscaling.transpose(-2, -1) @ self.q_output
+        dkey = dscaling.transpose(0, 2, 1) @ self.q_output
 
         dx_v = self.value.backward(dvalue)
         dx_q = self.query.backward(dquery)

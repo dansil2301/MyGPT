@@ -22,5 +22,4 @@ class SGD(ABSGradient):
             layer.weights -= self.lr * layer.d_weights
             layer.bias -= self.lr * layer.d_bias
         elif type(layer) == Embedding:
-            for token_id in layer.d_embeddings:
-                layer.embeddings[token_id] - layer.d_embeddings[token_id]
+            layer.embeddings -= self.lr * layer.d_embeddings
