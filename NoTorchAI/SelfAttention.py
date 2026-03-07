@@ -1,7 +1,7 @@
 import numpy as np
 from NoTorchAI.ActivationFunc import Softmax
 from NoTorchAI.Layers.LinearLayer import Linear
-from NoTorchAI.SGD import SGD, ABSGradient
+from NoTorchAI.Gradients.ABSGradient import ABSGradient
 
 
 class SelfAttention:
@@ -35,7 +35,7 @@ class SelfAttention:
         self.gradient_technic.step(self.key)
         self.gradient_technic.step(self.value)
 
-    def forward(self, x: np.array):
+    def forward(self, x: np.ndarray) -> np.ndarray:
         B, T, E = x.shape
 
         self.q_output = self.query.forward(x)
@@ -49,7 +49,7 @@ class SelfAttention:
 
         return np.matmul(self.attention, self.v_output)
     
-    def backward(self, incoming_grad: np.array):
+    def backward(self, incoming_grad: np.ndarray) -> np.ndarray:
         B, T, E = incoming_grad.shape
 
         dvalue = self.attention.transpose(0, 2, 1) @ incoming_grad

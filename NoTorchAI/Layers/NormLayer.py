@@ -4,7 +4,7 @@ from numpy.random import default_rng
 from NoTorchAI.Layers.ABSLayer import ABSLayer
 
 
-class Normalization(ABSLayer):
+class NormLayer(ABSLayer):
     def __init__(self, d_model: int):
         self.weights = np.ones(d_model)
         self.bias = np.zeros(d_model)

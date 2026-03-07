@@ -3,20 +3,12 @@ import numpy as np
 from abc import ABC, abstractmethod
 
 from NoTorchAI.Embedding import Embedding
+from NoTorchAI.Gradients import ABSGradient
 from NoTorchAI.Layers.ABSLayer import ABSLayer
 
 
-class ABSGradient(ABC):
-    def __init__(self):
-        pass
-
-    @abstractmethod
-    def step(self, layer: ABSLayer) -> None:
-        pass
-
-
 class SGD(ABSGradient):
-    def __init__(self, lr, warmup_steps=100):
+    def __init__(self, lr: float, warmup_steps: int = 100):
         self.base_lr = lr
         self.warmup_steps = warmup_steps
         self.step_count = 0
