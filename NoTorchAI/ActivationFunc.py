@@ -29,6 +29,7 @@ class Softmax(ActivationFunc):
         dot = np.sum(self.output * incoming_grad, axis=-1, keepdims=True)
         outgoing_grad = self.output * (incoming_grad - dot)
 
+        self.output = None
         return outgoing_grad
     
 

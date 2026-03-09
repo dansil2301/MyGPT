@@ -24,4 +24,8 @@ class Linear(ABSLayer):
         self.d_bias = np.sum(incoming_grad, axis=(0, 1))
 
         outgoing_grad = incoming_grad @ self.weights.T
+
+        # Memoty optimization
+        self.input = None
+        
         return outgoing_grad

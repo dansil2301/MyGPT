@@ -37,4 +37,8 @@ class CrossEntropy:
 
         grad /= (B * T)
 
+        # Memory optimization
+        self.p_logits = None
+        self.targets = None
+
         return grad

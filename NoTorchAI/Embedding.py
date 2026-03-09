@@ -11,14 +11,11 @@ class Embedding:
         self.input_indices = None
         self.d_embeddings = None
 
-        self.grad = None
-
     def forward(self, indices: np.ndarray) -> np.ndarray:
         self.input_indices = indices
         return self.embeddings[indices]
 
     def backward(self, incoming_grad: np.ndarray) -> None:
-        self.grad = incoming_grad
         self.d_embeddings = np.zeros_like(self.embeddings)
 
         np.add.at(self.d_embeddings, self.input_indices, incoming_grad)

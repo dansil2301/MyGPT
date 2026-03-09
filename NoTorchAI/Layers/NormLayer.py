@@ -40,7 +40,7 @@ class NormLayer(ABSLayer):
             - self.x_hat * sum_dxhat_xhat
         )
 
-        # Memoty optimization
+        # Memory optimization
         self.input = None
         self.x_hat = None
         self.mean = None
