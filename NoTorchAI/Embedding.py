@@ -6,7 +6,7 @@ class Embedding:
     def __init__(self, num_embedding: int, d_model: int):
         rng = default_rng()
 
-        self.embeddings = rng.normal(0, 0.02, (num_embedding, d_model))
+        self.embeddings = rng.normal(0, 0.02, (num_embedding, d_model)).astype(np.float32)
 
         self.input_indices = None
         self.d_embeddings = None

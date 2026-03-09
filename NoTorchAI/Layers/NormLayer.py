@@ -6,8 +6,8 @@ from NoTorchAI.Layers.ABSLayer import ABSLayer
 
 class NormLayer(ABSLayer):
     def __init__(self, d_model: int):
-        self.weights = np.ones(d_model)
-        self.bias = np.zeros(d_model)
+        self.weights = np.ones(d_model, dtype=np.float32)
+        self.bias = np.zeros(d_model, dtype=np.float32)
         self.epsilon = 1e-5
 
         self.x_hat = None
@@ -39,5 +39,11 @@ class NormLayer(ABSLayer):
             - sum_dxhat
             - self.x_hat * sum_dxhat_xhat
         )
+
+        # Memoty optimization
+        self.input = None
+        self.x_hat = None
+        self.mean = None
+        self.variance = None
 
         return dx

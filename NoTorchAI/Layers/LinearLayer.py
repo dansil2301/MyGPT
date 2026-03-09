@@ -8,8 +8,8 @@ class Linear(ABSLayer):
     def __init__(self, in_feature: int, out_feature: int):
         rng = default_rng()
 
-        self.weights = rng.normal(0, 0.02, (in_feature, out_feature))
-        self.bias =  np.zeros(out_feature)
+        self.weights = rng.normal(0, 0.02, (in_feature, out_feature)).astype(np.float32)
+        self.bias =  np.zeros(out_feature, dtype=np.float32)
 
         self.input = None
         self.d_weights = None
@@ -20,7 +20,6 @@ class Linear(ABSLayer):
         return x @ self.weights + self.bias
 
     def backward(self, incoming_grad: np.ndarray) -> np.ndarray:
-        self.grad = incoming_grad
         self.d_weights = np.sum(self.input.transpose(0, 2, 1) @ incoming_grad, axis=0)
         self.d_bias = np.sum(incoming_grad, axis=(0, 1))
 
