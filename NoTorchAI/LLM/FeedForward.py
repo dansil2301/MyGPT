@@ -1,11 +1,12 @@
 import numpy as np
 
-from NoTorchAI.ActivationFunc import ReLu
+from NoTorchAI.Activation.ReLu import ReLu
 from NoTorchAI.Gradients.ABSGradient import ABSGradient
 from NoTorchAI.Layers.LinearLayer import Linear
+from NoTorchAI.Neuron import Neuron
 
 
-class FeedForward:
+class FeedForward(Neuron):
     def __init__(self, d_model: int, gradient: ABSGradient):
         self.linear1 = Linear(d_model, 4 * d_model)
         self.relu = ReLu()

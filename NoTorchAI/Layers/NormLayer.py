@@ -2,9 +2,10 @@ import numpy as np
 from numpy.random import default_rng
 
 from NoTorchAI.Layers.ABSLayer import ABSLayer
+from NoTorchAI.Neuron import Neuron
 
 
-class NormLayer(ABSLayer):
+class NormLayer(ABSLayer, Neuron):
     def __init__(self, d_model: int):
         self.weights = np.ones(d_model, dtype=np.float32)
         self.bias = np.zeros(d_model, dtype=np.float32)

@@ -4,9 +4,10 @@ from NoTorchAI.Gradients.ABSGradient import ABSGradient
 from NoTorchAI.LLM.FeedForward import FeedForward
 from NoTorchAI.LLM.SelfAttention import SelfAttention
 from NoTorchAI.Layers.NormLayer import NormLayer
+from NoTorchAI.Neuron import Neuron
 
 
-class Block:
+class Block(Neuron):
     def __init__(self, d_model: int, gradient: ABSGradient):
         super().__init__()
         self.linear1 = NormLayer(d_model)

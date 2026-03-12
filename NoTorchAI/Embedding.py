@@ -1,8 +1,10 @@
 import numpy as np
 from numpy.random import default_rng
 
+from NoTorchAI.Neuron import Neuron
 
-class Embedding:
+
+class Embedding(Neuron):
     def __init__(self, num_embedding: int, d_model: int):
         rng = default_rng()
 

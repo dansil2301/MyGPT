@@ -1,16 +1,6 @@
-from abc import ABC, abstractmethod
-
 import numpy as np
 
-
-class ActivationFunc(ABC):
-    @abstractmethod
-    def forward(self, x: np.ndarray) -> np.ndarray:
-        pass
-
-    @abstractmethod
-    def backward(self, icoming_grad: np.ndarray) -> np.ndarray:
-        pass
+from NoTorchAI.Activation.ActivationFunc import ActivationFunc
 
 
 class Softmax(ActivationFunc):
@@ -31,15 +21,3 @@ class Softmax(ActivationFunc):
 
         self.output = None
         return outgoing_grad
-    
-
-class ReLu(ActivationFunc):
-    def __init__(self):
-        self.mask = None
-
-    def forward(self, x):
-        self.mask = (x > 0)  # store mask directly
-        return np.where(self.mask, x, 0)
-
-    def backward(self, incoming_grad):
-        return self.mask * incoming_grad

@@ -1,10 +1,11 @@
 import numpy as np
-from NoTorchAI.ActivationFunc import Softmax
+from NoTorchAI.Neuron import Neuron
+from NoTorchAI.Activation.Softmax import Softmax
 from NoTorchAI.Layers.LinearLayer import Linear
 from NoTorchAI.Gradients.ABSGradient import ABSGradient
 
 
-class SelfAttention:
+class SelfAttention(Neuron):
     def __init__(self, d_model: int, gradient_technic: ABSGradient):
         self.gradient_technic = gradient_technic
 

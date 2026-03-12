@@ -1,9 +1,10 @@
 import numpy as np
 
-from NoTorchAI.ActivationFunc import Softmax
+from NoTorchAI.Activation.Softmax import Softmax
+from NoTorchAI.Neuron import Neuron
 
 
-class CrossEntropy:
+class CrossEntropy(Neuron):
     def __init__(self):
         self.softmax = Softmax()
         self.p_logits = None

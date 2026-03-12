@@ -2,9 +2,10 @@ import numpy as np
 
 from NoTorchAI.Embedding import Embedding
 from NoTorchAI.Gradients.ABSGradient import ABSGradient
+from NoTorchAI.Neuron import Neuron
 
 
-class EmbeddingInitial:
+class EmbeddingInitial(Neuron):
     def __init__(self, vocab_size: int, d_model: int, block_size: int, gradient: ABSGradient):
         self.token_embedding = Embedding(vocab_size, d_model)
         self.position_embedding = Embedding(block_size, d_model)

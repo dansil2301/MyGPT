@@ -1,5 +1,6 @@
 import numpy as np
 
+from NoTorchAI.Neuron import Neuron
 from NoTorchAI.CrossEntropy import CrossEntropy
 from NoTorchAI.Gradients.ABSGradient import ABSGradient
 from NoTorchAI.LLM.Block import Block
@@ -8,7 +9,7 @@ from NoTorchAI.Layers.LinearLayer import Linear
 from NoTorchAI.Layers.NormLayer import NormLayer
 
 
-class MiniGPT:
+class MiniGPT(Neuron):
     def __init__(self, vocab_size: int, d_model: int, block_size: int, n_layers: int, gradient: ABSGradient):
         super().__init__()
 
