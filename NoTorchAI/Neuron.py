@@ -1,42 +1,36 @@
-import pprint as pp
+import numpy as np
 
 
 class Neuron:
-    def _save(self, layer_id: int = 0, saved: dict = {}):
+    def _save(self, saved: dict = {}):
         """
-        I made this saving mechanism depend on the order of attributes 
-        initialized in the __init__ (not the most perfect lol)
+        Saves information in the folded list
         """
-        # todo: rebuild to create a folded list with all subclasses (easier to manage)
         c_cls_name = self.__class__.__name__
-        c_layer_id = layer_id
-        
-        neuron_id = f"{c_layer_id}_{c_cls_name}"
-        saved[neuron_id] = {}
+        saved[c_cls_name] = {}
 
-        for attr_name in reversed(self.__dict__):
+        for attr_name in self.__dict__:
             if isinstance(self.__dict__[attr_name], Neuron):
-                layer_id += 1
-                saved, layer_id = self.__dict__[attr_name]._save(layer_id, saved)
+                saved[c_cls_name][attr_name] = {}
+                saved[c_cls_name][attr_name] = self.__dict__[attr_name]._save(saved[c_cls_name][attr_name])
             elif isinstance(self.__dict__[attr_name], list):
                 ls = self.__dict__[attr_name]
                 if ls and isinstance(ls[0], Neuron):
                     for neuron in ls:
-                        layer_id += 1
-                        saved, layer_id = neuron._save(layer_id, saved)
+                        if attr_name not in saved[c_cls_name]:
+                            saved[c_cls_name][attr_name] = []
+                        saved[c_cls_name][attr_name].append(neuron._save({}))
             else:
-                saved[neuron_id][attr_name] = self.__dict__[attr_name]
-        
-        print()
-        print(pp.pformat(saved))
-        return saved, layer_id
+                saved[c_cls_name][attr_name] = self.__dict__[attr_name]
 
-
-        pass
+        return saved
 
     def save(self, path: str) -> None:
-        self._save()
-        pass
+        saved = self._save()
+        np.savez(path + ".npz", saved)
 
     def load(self, path: str) -> None:
-        pass
+        saved = np.load(path + ".npz", allow_pickle=True)
+        print(saved.files)
+        for key in saved.files:
+            print(saved[key])
