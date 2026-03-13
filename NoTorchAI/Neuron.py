@@ -1,5 +1,7 @@
 import numpy as np
 
+from typing import Tuple, Optional
+
 
 class Neuron:
     def _save(self, saved: dict = {}):
@@ -26,25 +28,48 @@ class Neuron:
         return saved
     
     def _find_implementation(self, name: str) -> type:
-        subclasses = Neuron.__subclasses__()
-        for subclass in subclasses:
-            if subclass.__name__ == str(name):
-                return subclass
+        try:
+            subclasses = Neuron.__subclasses__()
+            for subclass in subclasses:
+                if subclass.__name__ == str(name):
+                    return subclass
+        except:
+            return None
         return None
+    
+    def _check_dict_content_for_class_name(self, saved_dic: dict) -> object:
+        class_name = list(saved_dic.keys())[0]
+        attrs = saved_dic[class_name]
+        impl_class = self._find_implementation(class_name)
+        if impl_class:
+            instance = impl_class.__new__(impl_class)
+            self._load(attrs, instance)
+            return instance
+        else:
+            return None
 
     def _load(self, saved: dict, c_class_impl: object = None):
         # todo: add list check. Some lists contain Neurons 
         for el in saved:
-            print(el, saved[el])
             # check if the dict is an element or a folded Neuron
             if isinstance(saved[el], dict):
-                class_name = list(saved[el].keys())[0]
-                attrs = saved[el][class_name]
-                impl_class = self._find_implementation(class_name)
-                if impl_class:
-                    instance = impl_class.__new__(impl_class)
-                    self._load(attrs, instance)
+                instance = self._check_dict_content_for_class_name(saved[el])
+                if instance:
                     setattr(c_class_impl, el, instance)
+                else:
+                    setattr(c_class_impl, el, saved[el])
+            # check if array element is an element of a folded Neuron
+            elif isinstance(saved[el], list):
+                new_ls = []
+                for ls_el in saved[el]:
+                    instance = None
+                    if isinstance(ls_el, dict):
+                        instance = self._check_dict_content_for_class_name(ls_el)
+                    if instance:
+                        new_ls.append(instance)
+                    else:
+                        new_ls.append(ls_el)
+                setattr(c_class_impl, el, new_ls)
             # if not Neuron just save the value to the variable
             else:
                 setattr(c_class_impl, el, saved[el])
