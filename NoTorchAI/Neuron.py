@@ -49,7 +49,6 @@ class Neuron:
             return None
 
     def _load(self, saved: dict, c_class_impl: object = None):
-        # todo: add list check. Some lists contain Neurons 
         for el in saved:
             # check if the dict is an element or a folded Neuron
             if isinstance(saved[el], dict):
@@ -78,7 +77,7 @@ class Neuron:
 
     def save(self, path: str) -> None:
         saved = self._save()
-        np.savez(path + ".npz", saved)
+        np.savez(path + ".npz", arr_0=saved)
 
     def load(self, path: str):
         archive = np.load(path + ".npz", allow_pickle=True)
@@ -86,8 +85,6 @@ class Neuron:
         saved = archive["arr_0"]
         if isinstance(saved, np.ndarray) and saved.dtype == object:
             saved = saved.item()
-        print(saved)
-        print()
         
         # create instance of the saved class and load into it
         init_name = list(saved.keys())[0]
