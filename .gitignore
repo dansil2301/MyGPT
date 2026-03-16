@@ -1,6 +1,5 @@
 .vscode/
 .venv/
 __pycache__/
-wiki.train.tokens
-train.bin
+train*
 stoi.json
