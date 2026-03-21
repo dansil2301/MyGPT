@@ -5,8 +5,9 @@ from NoTorchAI.Neuron import Neuron
 
 
 class CrossEntropy(Neuron):
-    def __init__(self):
-        self.softmax = Softmax()
+    def __init__(self, device: str = "cpu"):
+        super().__init__(device)
+        self.softmax = Softmax(device)
         self.p_logits = None
         self.targets = None
 
@@ -17,22 +18,22 @@ class CrossEntropy(Neuron):
         self.p_logits = self.softmax.forward(logits)
 
         p_correct = self.p_logits[
-            np.arange(B)[:, None],
-            np.arange(T)[None, :],
+            self.xp.arange(B)[:, None],
+            self.xp.arange(T)[None, :],
             targets
         ]
 
-        L = -np.mean(np.log(p_correct))
+        L = -self.xp.mean(self.xp.log(p_correct))
         return L
 
     def backward(self):
         B, T, V = self.p_logits.shape
 
-        grad = np.copy(self.p_logits)
+        grad = self.xp.copy(self.p_logits)
 
         grad[
-            np.arange(B)[:, None],
-            np.arange(T)[None, :],
+            self.xp.arange(B)[:, None],
+            self.xp.arange(T)[None, :],
             self.targets
         ] -= 1
 

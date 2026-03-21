@@ -1,9 +1,12 @@
 from abc import ABC, abstractmethod
 import numpy as np
 
+from NoTorchAI.Neuron import Neuron
 
-class ABSLayer(ABC):
-    def __init__(self):
+
+class ABSLayer(ABC, Neuron):
+    def __init__(self, device: str):
+        super().__init__(device)
         self.weights = None
         self.bias = None
 

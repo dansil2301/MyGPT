@@ -5,10 +5,9 @@ from NoTorchAI.Neuron import Neuron
 
 
 class Embedding(Neuron):
-    def __init__(self, num_embedding: int, d_model: int):
-        rng = default_rng()
-
-        self.embeddings = rng.normal(0, 0.02, (num_embedding, d_model)).astype(np.float32)
+    def __init__(self, num_embedding: int, d_model: int, device: str = "cpu"):
+        super().__init__(device)
+        self.embeddings = self.xp.random.normal(0, 0.02, (num_embedding, d_model)).astype(self.xp.float32)
 
         self.input_indices = None
         self.d_embeddings = None
@@ -18,6 +17,6 @@ class Embedding(Neuron):
         return self.embeddings[indices]
 
     def backward(self, incoming_grad: np.ndarray) -> None:
-        self.d_embeddings = np.zeros_like(self.embeddings)
+        self.d_embeddings = self.xp.zeros_like(self.embeddings)
 
-        np.add.at(self.d_embeddings, self.input_indices, incoming_grad)
+        self.xp.add.at(self.d_embeddings, self.input_indices, incoming_grad)

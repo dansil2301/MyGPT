@@ -1,9 +1,14 @@
 import numpy as np
 
-from typing import Tuple, Optional
+from NoTorchAI.GlobalState.Device import Device
 
 
 class Neuron:
+    def __init__(self, device: str):
+        self.device_str = device
+        self.device = Device(device)
+        self.xp = self.device.set_module()
+
     def _save(self, saved: dict = {}):
         """
         Saves information in the folded list
@@ -12,6 +17,8 @@ class Neuron:
         saved[c_cls_name] = {}
 
         for attr_name in self.__dict__:
+            if attr_name in ['xp', 'device']:
+                continue
             if isinstance(self.__dict__[attr_name], Neuron):
                 saved[c_cls_name][attr_name] = {}
                 saved[c_cls_name][attr_name] = self.__dict__[attr_name]._save(saved[c_cls_name][attr_name])
@@ -91,4 +98,15 @@ class Neuron:
         init_class = self._find_implementation(init_name)
         instance = init_class.__new__(init_class)
         self._load(saved[init_name], instance)
+        
+        # set device and xp
+        if hasattr(instance, 'device_str'):
+            instance.device = Device(instance.device_str)
+            instance.xp = instance.device.set_module()
+        else:
+            # for backward compatibility
+            instance.device_str = 'cpu'
+            instance.device = Device('cpu')
+            instance.xp = instance.device.set_module()
+        
         return instance

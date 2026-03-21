@@ -10,16 +10,16 @@ from NoTorchAI.Layers.NormLayer import NormLayer
 
 
 class MiniGPT(Neuron):
-    def __init__(self, vocab_size: int, d_model: int, block_size: int, n_layers: int, gradient: ABSGradient):
-        super().__init__()
+    def __init__(self, vocab_size: int, d_model: int, block_size: int, n_layers: int, gradient: ABSGradient, device: str = "cpu"):
+        super().__init__(device)
 
-        self.initial_embedding = EmbeddingInitial(vocab_size, d_model, block_size, gradient)
+        self.initial_embedding = EmbeddingInitial(vocab_size, d_model, block_size, gradient, device)
 
-        self.blocks = [Block(d_model, gradient) for _ in range(n_layers)]
+        self.blocks = [Block(d_model, gradient, device) for _ in range(n_layers)]
 
-        self.linear = NormLayer(d_model)
-        self.head = Linear(d_model, vocab_size)
-        self.cross_entropy = CrossEntropy()
+        self.linear = NormLayer(d_model, device)
+        self.head = Linear(d_model, vocab_size, device)
+        self.cross_entropy = CrossEntropy(device)
 
         self.block_size = block_size
 

@@ -6,7 +6,8 @@ from NoTorchAI.Layers.ABSLayer import ABSLayer
 
 
 class Adam(ABSGradient):
-    def __init__(self, lr=3e-4, beta1=0.9, beta2=0.95, eps=1e-8, warmup_steps=0, min_lr=1e-6):
+    def __init__(self, lr=3e-4, beta1=0.9, beta2=0.95, eps=1e-8, warmup_steps=0, min_lr=1e-6, device: str = "cpu"):
+        super().__init__(device)
         self.lr = lr
         self.beta1 = beta1
         self.beta2 = beta2
@@ -35,8 +36,8 @@ class Adam(ABSGradient):
             key = (id(layer), param_name)
 
             if key not in self.m:
-                self.m[key] = np.zeros_like(grad)
-                self.v[key] = np.zeros_like(grad)
+                self.m[key] = self.xp.zeros_like(grad)
+                self.v[key] = self.xp.zeros_like(grad)
 
             self.m[key] = self.beta1 * self.m[key] + (1 - self.beta1) * grad
             self.v[key] = self.beta2 * self.v[key] + (1 - self.beta2) * (grad ** 2)
@@ -49,6 +50,6 @@ class Adam(ABSGradient):
                 v_hat = self.v[key] / (1 - self.beta2 ** self.t)
 
             lr = self.get_lr()
-            param -= lr * m_hat / (np.sqrt(v_hat) + self.eps)
+            param -= lr * m_hat / (self.xp.sqrt(v_hat) + self.eps)
 
             setattr(layer, param_name, param)

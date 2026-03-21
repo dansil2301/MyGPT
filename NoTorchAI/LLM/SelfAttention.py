@@ -6,19 +6,20 @@ from NoTorchAI.Gradients.ABSGradient import ABSGradient
 
 
 class SelfAttention(Neuron):
-    def __init__(self, d_model: int, gradient_technic: ABSGradient):
+    def __init__(self, d_model: int, gradient_technic: ABSGradient, device: str = "cpu"):
+        super().__init__(device)
         self.gradient_technic = gradient_technic
 
-        self.query = Linear(d_model, d_model)
-        self.key = Linear(d_model, d_model)
-        self.value = Linear(d_model, d_model)
+        self.query = Linear(d_model, d_model, device)
+        self.key = Linear(d_model, d_model, device)
+        self.value = Linear(d_model, d_model, device)
 
         self.q_output = None
         self.k_output = None
         self.v_output = None
 
         self.scores = None
-        self.softmax = Softmax()
+        self.softmax = Softmax(device)
 
         self.attention = None
         self.output = None
@@ -26,9 +27,9 @@ class SelfAttention(Neuron):
     def _mask_fill(self, tensor: np.ndarray):
         B, T, _ = tensor.shape
 
-        mask = np.triu(np.ones((T, T), dtype=bool), k=1)
+        mask = self.xp.triu(self.xp.ones((T, T), dtype=bool), k=1)
         mask = mask[None, :, :]
-        tensor = np.where(mask, -np.inf, tensor)
+        tensor = self.xp.where(mask, -self.xp.inf, tensor)
         return tensor
     
     def _change_weights(self):
@@ -48,7 +49,7 @@ class SelfAttention(Neuron):
         masked_scores = self._mask_fill(self.scores)
         self.attention = self.softmax.forward(masked_scores)
 
-        return np.matmul(self.attention, self.v_output)
+        return self.xp.matmul(self.attention, self.v_output)
     
     def backward(self, incoming_grad: np.ndarray) -> np.ndarray:
         B, T, E = incoming_grad.shape

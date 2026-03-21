@@ -4,19 +4,20 @@ from NoTorchAI.Activation.ActivationFunc import ActivationFunc
 
 
 class Softmax(ActivationFunc):
-    def __init__(self):
+    def __init__(self, device: str = "cpu"):
+        super().__init__(device)
         self.output = None
 
     def forward(self, x: np.ndarray) -> np.ndarray:
-        x_stable = x - np.max(x, axis=-1, keepdims=True)
+        x_stable = x - self.xp.max(x, axis=-1, keepdims=True)
 
-        exp_x = np.exp(x_stable)
-        self.output = exp_x / np.sum(exp_x, axis=-1, keepdims=True)
+        exp_x = self.xp.exp(x_stable)
+        self.output = exp_x / self.xp.sum(exp_x, axis=-1, keepdims=True)
 
         return self.output
 
     def backward(self, incoming_grad: np.ndarray) -> np.ndarray:
-        dot = np.sum(self.output * incoming_grad, axis=-1, keepdims=True)
+        dot = self.xp.sum(self.output * incoming_grad, axis=-1, keepdims=True)
         outgoing_grad = self.output * (incoming_grad - dot)
 
         self.output = None

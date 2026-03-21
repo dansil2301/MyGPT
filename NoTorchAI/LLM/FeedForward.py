@@ -7,10 +7,11 @@ from NoTorchAI.Neuron import Neuron
 
 
 class FeedForward(Neuron):
-    def __init__(self, d_model: int, gradient: ABSGradient):
-        self.linear1 = Linear(d_model, 4 * d_model)
-        self.relu = ReLu()
-        self.linear2 = Linear(4 * d_model, d_model)
+    def __init__(self, d_model: int, gradient: ABSGradient, device: str = "cpu"):
+        super().__init__(device)
+        self.linear1 = Linear(d_model, 4 * d_model, device)
+        self.relu = ReLu(device)
+        self.linear2 = Linear(4 * d_model, d_model, device)
 
         self.gradient = gradient
 
