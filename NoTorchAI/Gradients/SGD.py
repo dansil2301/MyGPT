@@ -1,8 +1,4 @@
-import numpy as np
-
-from abc import ABC, abstractmethod
-
-from NoTorchAI.Embedding import Embedding
+from NoTorchAI.Layers.Embedding import Embedding
 from NoTorchAI.Gradients import ABSGradient
 from NoTorchAI.Layers.ABSLayer import ABSLayer
 

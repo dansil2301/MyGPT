@@ -1,15 +1,15 @@
 import numpy as np
 
-from NoTorchAI.Embedding import Embedding
+from NoTorchAI.Layers.Embedding import Embedding
 from NoTorchAI.Gradients.ABSGradient import ABSGradient
 from NoTorchAI.Neuron import Neuron
 
 
 class EmbeddingInitial(Neuron):
-    def __init__(self, vocab_size: int, d_model: int, block_size: int, gradient: ABSGradient, device: str = "cpu"):
+    def __init__(self, vocab_size: int, d_model: int, block_size: int, gradient: ABSGradient, device: str = "cpu", quant: int = 16):
         super().__init__(device)
-        self.token_embedding = Embedding(vocab_size, d_model, device)
-        self.position_embedding = Embedding(block_size, d_model, device)
+        self.token_embedding = Embedding(vocab_size, d_model, device, quant)
+        self.position_embedding = Embedding(block_size, d_model, device, quant)
         self.gradient = gradient
 
     def _change_weights(self) -> None:

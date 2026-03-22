@@ -1,13 +1,13 @@
 import numpy as np
-from numpy.random import default_rng
 
+from NoTorchAI.Layers.ABSLayer import ABSLayer
 from NoTorchAI.Neuron import Neuron
 
 
-class Embedding(Neuron):
-    def __init__(self, num_embedding: int, d_model: int, device: str = "cpu"):
-        super().__init__(device)
-        self.embeddings = self.xp.random.normal(0, 0.02, (num_embedding, d_model)).astype(self.xp.float32)
+class Embedding(ABSLayer, Neuron):
+    def __init__(self, num_embedding: int, d_model: int, device: str = "cpu", quant: int = 16):
+        super().__init__(device, quant)
+        self.embeddings = self.xp.random.normal(0, 0.02, (num_embedding, d_model)).astype(self.quant)
 
         self.input_indices = None
         self.d_embeddings = None

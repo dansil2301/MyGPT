@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
-from NoTorchAI.Embedding import Embedding
 from NoTorchAI.Layers.ABSLayer import ABSLayer
+from NoTorchAI.Layers.Embedding import Embedding
 from NoTorchAI.Neuron import Neuron
 
 

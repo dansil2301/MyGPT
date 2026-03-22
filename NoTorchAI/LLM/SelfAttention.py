@@ -6,13 +6,13 @@ from NoTorchAI.Gradients.ABSGradient import ABSGradient
 
 
 class SelfAttention(Neuron):
-    def __init__(self, d_model: int, gradient_technic: ABSGradient, device: str = "cpu"):
+    def __init__(self, d_model: int, gradient_technic: ABSGradient, device: str = "cpu", quant: int = 16):
         super().__init__(device)
         self.gradient_technic = gradient_technic
 
-        self.query = Linear(d_model, d_model, device)
-        self.key = Linear(d_model, d_model, device)
-        self.value = Linear(d_model, d_model, device)
+        self.query = Linear(d_model, d_model, device, quant)
+        self.key = Linear(d_model, d_model, device, quant)
+        self.value = Linear(d_model, d_model, device, quant)
 
         self.q_output = None
         self.k_output = None
@@ -45,6 +45,8 @@ class SelfAttention(Neuron):
         self.v_output = self.value.forward(x)
 
         self.scores = (self.q_output @ self.k_output.transpose(0, 2, 1)) / (E ** 0.5)
+
+        self.scores = self.xp.clip(self.scores, -10, 10)
 
         masked_scores = self._mask_fill(self.scores)
         self.attention = self.softmax.forward(masked_scores)

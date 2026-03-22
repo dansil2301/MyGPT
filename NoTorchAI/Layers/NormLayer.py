@@ -4,10 +4,10 @@ from NoTorchAI.Layers.ABSLayer import ABSLayer
 
 
 class NormLayer(ABSLayer):
-    def __init__(self, d_model: int, device: str = "cpu"):
-        super().__init__(device)
-        self.weights = self.xp.ones(d_model, dtype=self.xp.float32)
-        self.bias = self.xp.zeros(d_model, dtype=self.xp.float32)
+    def __init__(self, d_model: int, device: str = "cpu", quant: int = 16):
+        super().__init__(device, quant)
+        self.weights = self.xp.ones(d_model, dtype=self.quant)
+        self.bias = self.xp.zeros(d_model, dtype=self.quant)
         self.epsilon = 1e-5
 
         self.x_hat = None
