@@ -11,12 +11,12 @@ from NoTorchAI.Layers.NormLayer import NormLayer
 
 
 class MiniGPT(Neuron):
-    def __init__(self, vocab_size: int, d_model: int, block_size: int, n_layers: int, gradient: ABSGradient, device: str = "cpu", quant: int = 16):
+    def __init__(self, vocab_size: int, d_model: int, block_size: int, n_layers: int, n_heads: int, gradient: ABSGradient, device: str = "cpu", quant: int = 16):
         super().__init__(device)
 
         self.initial_embedding = EmbeddingInitial(vocab_size, d_model, block_size, gradient, device, quant)
 
-        self.blocks = [Block(d_model, gradient, device, quant) for _ in range(n_layers)]
+        self.blocks = [Block(d_model, n_heads, gradient, device, quant) for _ in range(n_layers)]
 
         self.linear = NormLayer(d_model, device, quant)
         self.head = Linear(d_model, vocab_size, device, quant)
@@ -72,28 +72,30 @@ class MiniGPT(Neuron):
         self._change_weights()
 
 
-    def generate(self, idx, max_new_tokens, temperature: int = 0.9):
+    def generate(self, idx, max_new_tokens, temperature: float = 0.9):
         for _ in range(max_new_tokens):
             idx_cond = idx[:, -self.block_size:]
-            
-            logits, _ = self.forward(idx_cond, np.array([1]))
-            
-            logits = logits[:, -1, :] / temperature
-            
-            logits = self.xp.clip(logits, -10, 10)
-            
-            probs = self.softmax.forward(logits)
-            
-            if self.device_str == "gpu":
-                probs = probs.get()  # cupy covertion
-            
-            next_tokens = []
-            for b in range(probs.shape[0]):
-                next_token = np.random.choice(probs.shape[-1], p=probs[b])
-                next_tokens.append(next_token)
-            
-            next_token = np.array(next_tokens).reshape(-1, 1)
-            
+
+            logits, _ = self.forward(idx_cond)
+
+            if temperature == 0:
+                # greedy decode
+                next_token = self.xp.argmax(logits[:, -1, :], axis=-1)
+                next_token = self.xp.expand_dims(next_token, axis=-1)
+            else:
+                logits = logits[:, -1, :] / temperature
+                probs = self.softmax.forward(logits)
+
+                if self.device_str == "gpu":
+                    probs = probs.get()  # cupy conversion
+
+                next_tokens = []
+                for b in range(probs.shape[0]):
+                    next_token = np.random.choice(probs.shape[-1], p=probs[b])
+                    next_tokens.append(next_token)
+
+                next_token = np.array(next_tokens).reshape(-1, 1)
+
             idx = np.concatenate([idx, next_token], axis=1)
-        
+
         return idx

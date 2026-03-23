@@ -31,7 +31,6 @@ class Adam(ABSGradient):
                 continue
 
             grad = getattr(layer, grad_name)
-            grad = self.xp.clip(grad, -5.0, 5.0)
             param = getattr(layer, param_name)
 
             key = (id(layer), param_name)

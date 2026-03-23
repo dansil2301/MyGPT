@@ -2,16 +2,17 @@ import numpy as np
 
 from NoTorchAI.Gradients.ABSGradient import ABSGradient
 from NoTorchAI.LLM.FeedForward import FeedForward
+from NoTorchAI.LLM.MultiHead import MultiHead
 from NoTorchAI.LLM.SelfAttention import SelfAttention
 from NoTorchAI.Layers.NormLayer import NormLayer
 from NoTorchAI.Neuron import Neuron
 
 
 class Block(Neuron):
-    def __init__(self, d_model: int, gradient: ABSGradient, device: str = "cpu", quant: int = 16):
+    def __init__(self, d_model: int, n_heads: int, gradient: ABSGradient, device: str = "cpu", quant: int = 16):
         super().__init__(device)
         self.linear1 = NormLayer(d_model, device, quant)
-        self.attention = SelfAttention(d_model, gradient, device, quant)
+        self.attention = MultiHead(d_model, n_heads, gradient, device, quant)
         self.linear2 = NormLayer(d_model, device, quant)
         self.ff = FeedForward(d_model, gradient, device, quant)
 
