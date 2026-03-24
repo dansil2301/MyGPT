@@ -1,9 +1,10 @@
 from NoTorchAI.Layers.Embedding import Embedding
 from NoTorchAI.Gradients import ABSGradient
 from NoTorchAI.Layers.ABSLayer import ABSLayer
+from NoTorchAI.Neuron import Neuron
 
 
-class SGD(ABSGradient):
+class SGD(ABSGradient, Neuron):
     def __init__(self, lr: float, warmup_steps: int = 100, device: str = "cpu"):
         super().__init__(device)
         self.base_lr = lr

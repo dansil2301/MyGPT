@@ -1,9 +1,10 @@
 import numpy as np
 
 from NoTorchAI.Layers.ABSLayer import ABSLayer
+from NoTorchAI.Neuron import Neuron
 
 
-class NormLayer(ABSLayer):
+class NormLayer(ABSLayer, Neuron):
     def __init__(self, d_model: int, device: str = "cpu", quant: int = 16):
         super().__init__(device, quant)
         self.weights = self.xp.ones(d_model, dtype=self.quant)

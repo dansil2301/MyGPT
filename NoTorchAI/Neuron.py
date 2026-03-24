@@ -1,3 +1,4 @@
+import cupy as cp
 import numpy as np
 
 from NoTorchAI.GlobalState.Device import Device
@@ -50,10 +51,16 @@ class Neuron:
         impl_class = self._find_implementation(class_name)
         if impl_class:
             instance = impl_class.__new__(impl_class)
+            self.set_xp_value(instance)
             self._load(attrs, instance)
             return instance
         else:
             return None
+
+    def set_xp_value(self, instance: object):
+        instance.device_str = 'cpu'
+        instance.device = Device('cpu')
+        instance.xp = instance.device.set_module()
 
     def _load(self, saved: dict, c_class_impl: object = None):
         for el in saved:
@@ -76,6 +83,9 @@ class Neuron:
                     else:
                         new_ls.append(ls_el)
                 setattr(c_class_impl, el, new_ls)
+            # covert cupy to numpy to run model on CPU by default
+            elif isinstance(saved[el], cp.ndarray):
+                setattr(c_class_impl, el, saved[el].get())
             # if not Neuron just save the value to the variable
             else:
                 setattr(c_class_impl, el, saved[el])
@@ -92,7 +102,7 @@ class Neuron:
         saved = archive["arr_0"]
         if isinstance(saved, np.ndarray) and saved.dtype == object:
             saved = saved.item()
-        
+
         # create instance of the saved class and load into it
         init_name = list(saved.keys())[0]
         init_class = self._find_implementation(init_name)
@@ -100,13 +110,6 @@ class Neuron:
         self._load(saved[init_name], instance)
         
         # set device and xp
-        if hasattr(instance, 'device_str'):
-            instance.device = Device(instance.device_str)
-            instance.xp = instance.device.set_module()
-        else:
-            # for backward compatibility
-            instance.device_str = 'cpu'
-            instance.device = Device('cpu')
-            instance.xp = instance.device.set_module()
+        self.set_xp_value(instance)
         
         return instance

@@ -3,9 +3,10 @@ import numpy as np
 from NoTorchAI.Gradients.ABSGradient import ABSGradient
 from NoTorchAI.Layers.ABSLayer import ABSLayer
 from NoTorchAI.Layers.Embedding import Embedding
+from NoTorchAI.Neuron import Neuron
 
 
-class Adam(ABSGradient):
+class Adam(ABSGradient, Neuron):
     def __init__(self, lr=3e-4, beta1=0.9, beta2=0.95, eps=1e-8, warmup_steps=0, min_lr=1e-6, device: str = "cpu"):
         super().__init__(device)
         self.lr = lr

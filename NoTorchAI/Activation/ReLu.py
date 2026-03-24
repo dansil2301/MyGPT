@@ -1,9 +1,10 @@
 import numpy as np
 
 from NoTorchAI.Activation.ActivationFunc import ActivationFunc
+from NoTorchAI.Neuron import Neuron
 
 
-class ReLu(ActivationFunc):
+class ReLu(ActivationFunc, Neuron):
     def __init__(self, device: str = "cpu"):
         super().__init__(device)
         self.mask = None

@@ -2,9 +2,10 @@ import numpy as np
 from numpy.random import default_rng
 
 from NoTorchAI.Layers.ABSLayer import ABSLayer
+from NoTorchAI.Neuron import Neuron
 
 
-class Linear(ABSLayer):
+class Linear(ABSLayer, Neuron):
     def __init__(self, in_feature: int, out_feature: int, device: str = "cpu", quant: int = 16):
         super().__init__(device, quant)
         
