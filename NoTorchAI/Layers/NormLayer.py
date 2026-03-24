@@ -19,7 +19,7 @@ class NormLayer(ABSLayer):
 
     def forward(self, x: np.ndarray) -> np.ndarray:
         self.mean = self.xp.mean(x, axis=-1, keepdims=True)
-        self.variance = x.var(axis=-1, keepdims=True) + self.epsilon
+        self.variance = self.xp.var(x, axis=-1, keepdims=True) + self.epsilon
         self.x_hat = (x - self.mean) / (self.variance ** 0.5)
         return self.weights * self.x_hat + self.bias
 

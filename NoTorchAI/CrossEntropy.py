@@ -15,7 +15,10 @@ class CrossEntropy(Neuron):
         B, T, V = logits.shape
 
         self.targets = targets
-        self.p_logits = self.softmax.forward(logits)
+        
+        x = logits - logits.max(axis=-1, keepdims=True)
+        exp = self.xp.exp(x)
+        self.p_logits = exp / exp.sum(axis=-1, keepdims=True)
 
         p_correct = self.p_logits[
             self.xp.arange(B)[:, None],
@@ -23,7 +26,7 @@ class CrossEntropy(Neuron):
             targets
         ]
 
-        L = -self.xp.mean(self.xp.log(p_correct))
+        L = -self.xp.mean(self.xp.log(self.xp.clip(p_correct, 1e-10, 1.0)))
         return L
 
     def backward(self):

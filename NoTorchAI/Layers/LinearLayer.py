@@ -7,7 +7,9 @@ from NoTorchAI.Layers.ABSLayer import ABSLayer
 class Linear(ABSLayer):
     def __init__(self, in_feature: int, out_feature: int, device: str = "cpu", quant: int = 16):
         super().__init__(device, quant)
-        self.weights = self.xp.random.normal(0, 0.02, (in_feature, out_feature)).astype(self.quant)
+        
+        std = (2.0 / in_feature) ** 0.5
+        self.weights = self.xp.random.normal(0, std, (in_feature, out_feature)).astype(self.quant)
         self.bias =  self.xp.zeros(out_feature, dtype=self.quant)
 
         self.input = None

@@ -24,13 +24,19 @@ class SelfAttention(Neuron):
         self.attention = None
         self.output = None
 
-    def _mask_fill(self, tensor: np.ndarray):
+    def _forward_mask_fill(self, tensor: np.ndarray):
         B, T, _ = tensor.shape
 
         mask = self.xp.triu(self.xp.ones((T, T), dtype=bool), k=1)
         mask = mask[None, :, :]
         tensor = self.xp.where(mask, -self.xp.inf, tensor)
         return tensor
+    
+    def _backward_mask_fill(self, grad: np.ndarray):
+        B, T, _ = grad.shape
+
+        mask = self.xp.triu(self.xp.ones((T, T), dtype=bool), k=1)[None, :, :]
+        return self.xp.where(mask, 0, grad)
     
     def _change_weights(self):
         self.gradient_technic.step(self.query)
@@ -46,9 +52,7 @@ class SelfAttention(Neuron):
 
         self.scores = (self.q_output @ self.k_output.transpose(0, 2, 1)) / (E ** 0.5)
 
-        self.scores = self.xp.clip(self.scores, -10, 10)
-
-        masked_scores = self._mask_fill(self.scores)
+        masked_scores = self._forward_mask_fill(self.scores)
         self.attention = self.softmax.forward(masked_scores)
 
         return self.xp.matmul(self.attention, self.v_output)
@@ -60,6 +64,7 @@ class SelfAttention(Neuron):
         dattention = incoming_grad @ self.v_output.transpose(0, 2, 1)
 
         dsoftmax = self.softmax.backward(dattention)
+        dsoftmax = self._backward_mask_fill(dsoftmax)
 
         dscaling = dsoftmax / (E ** 0.5)
 
