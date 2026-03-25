@@ -34,6 +34,12 @@ class Adam(ABSGradient, Neuron):
             grad = getattr(layer, grad_name)
             param = getattr(layer, param_name)
 
+            clip_value = 1.0
+            grad_norm = self.xp.linalg.norm(grad)
+
+            if grad_norm > clip_value:
+                grad = grad * (clip_value / (grad_norm + 1e-6))
+
             key = (id(layer), param_name)
 
             if key not in self.m:
