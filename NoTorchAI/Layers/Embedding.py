@@ -8,7 +8,7 @@ class Embedding(ABSLayer, Neuron):
     def __init__(self, num_embedding: int, d_model: int, device: str = "cpu", quant: int = 16):
         super().__init__(device, quant)
         
-        std = 1.0 / (d_model ** 0.5)
+        std = np.sqrt(2.0 / d_model)
         self.embeddings = self.xp.random.normal(0, std, (num_embedding, d_model)).astype(self.quant)
 
         self.input_indices = None

@@ -72,8 +72,9 @@ class MiniGPT(Neuron):
         self._change_weights()
 
 
-    def generate(self, idx, max_new_tokens, temperature: float = 0.9):
-        for _ in range(max_new_tokens):
+    def generate(self, idx, max_tokens, temperature: float = 0.9):
+        next_tokens = []
+        while idx.shape[1] <= max_tokens:
             idx_cond = idx[:, -self.block_size:]
 
             logits, _ = self.forward(idx_cond)
@@ -96,6 +97,7 @@ class MiniGPT(Neuron):
 
                 next_token = np.array(next_tokens).reshape(-1, 1)
 
+            print(idx.shape[1])
             idx = np.concatenate([idx, next_token], axis=1)
 
         return idx
