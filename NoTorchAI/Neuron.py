@@ -5,11 +5,6 @@ from NoTorchAI.GlobalState.Device import Device
 
 
 class Neuron:
-    def __init__(self, device: str):
-        self.device_str = device
-        self.device = Device(device)
-        self.xp = self.device.set_module()
-
     def _save(self, saved: dict = {}):
         """
         Saves information in the folded list

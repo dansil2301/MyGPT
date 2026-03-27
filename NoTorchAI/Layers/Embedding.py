@@ -2,14 +2,12 @@ import numpy as np
 
 from NoTorchAI.Layers.ABSLayer import ABSLayer
 from NoTorchAI.Neuron import Neuron
+from NoTorchAI.Utils.Matrix import Matrix
 
 
 class Embedding(ABSLayer, Neuron):
-    def __init__(self, num_embedding: int, d_model: int, device: str = "cpu", quant: int = 16):
-        super().__init__(device, quant)
-        
-        std = np.sqrt(2.0 / d_model)
-        self.embeddings = self.xp.random.normal(0, std, (num_embedding, d_model)).astype(self.quant)
+    def __init__(self, num_embedding: int, d_model: int):
+        self.embeddings = Matrix.xavier_init(num_embedding, d_model)
 
         self.input_indices = None
         self.d_embeddings = None
@@ -19,7 +17,7 @@ class Embedding(ABSLayer, Neuron):
         return self.embeddings[indices]
 
     def backward(self, incoming_grad: np.ndarray) -> None:
-        self.d_embeddings = self.xp.zeros_like(self.embeddings)
+        self.d_embeddings = Matrix.zeros_like(self.embeddings)
 
-        self.xp.add.at(self.d_embeddings, self.input_indices, incoming_grad)
-        return None  # Embeddings don't have upstream inputs
+        Matrix.add_at(self.d_embeddings, self.input_indices, incoming_grad)
+        return None

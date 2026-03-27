@@ -6,18 +6,17 @@ from NoTorchAI.Gradients.ABSGradient import ABSGradient
 from NoTorchAI.LLM.SelfAttention import SelfAttention
 from NoTorchAI.Layers.LinearLayer import Linear
 from NoTorchAI.Neuron import Neuron
+from NoTorchAI.Utils.Matrix import Matrix
 
 
 class MultiHead(Neuron):
-    def __init__(self, d_model: int, n_heads: int, gradient_technic: ABSGradient, device: str = "cpu", quant: int = 16):
-        super().__init__(device)
-
+    def __init__(self, d_model: int, n_heads: int, gradient_technic: ABSGradient):
         self.d_head = d_model // n_heads
         if self.d_head * n_heads != d_model:
             raise ValueError("Can't devide head dimensions equally")
 
-        self.heads = [SelfAttention(self.d_head, gradient_technic, device, quant) for _ in range(n_heads)]
-        self.linear1 = Linear(d_model, d_model, device, quant)
+        self.heads = [SelfAttention(self.d_head, gradient_technic) for _ in range(n_heads)]
+        self.linear1 = Linear(d_model, d_model)
 
         self.gradient = gradient_technic
 
@@ -31,7 +30,7 @@ class MultiHead(Neuron):
             x_head = x[:, :, self.d_head * i : self.d_head * (i + 1)]
             results_heads.append(head.forward(x_head))
 
-        concatinated = self.xp.concatenate(results_heads, axis=2)
+        concatinated = Matrix.concatenate(results_heads, axis=2)
 
         output = self.linear1.forward(concatinated)
         return output
@@ -45,7 +44,7 @@ class MultiHead(Neuron):
             grad_head = grad[:, :, self.d_head * i : self.d_head * (i + 1)]
             grads_heads.append(head.backward(grad_head))
 
-        grad = self.xp.concatenate(grads_heads, axis=2)
+        grad = Matrix.concatenate(grads_heads, axis=2)
 
         self._change_weights()
         return grad

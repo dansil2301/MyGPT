@@ -9,12 +9,11 @@ from NoTorchAI.Neuron import Neuron
 
 
 class Block(Neuron):
-    def __init__(self, d_model: int, n_heads: int, gradient: ABSGradient, device: str = "cpu", quant: int = 16):
-        super().__init__(device)
-        self.linear1 = NormLayer(d_model, device, quant)
-        self.attention = MultiHead(d_model, n_heads, gradient, device, quant)
-        self.linear2 = NormLayer(d_model, device, quant)
-        self.ff = FeedForward(d_model, gradient, device, quant)
+    def __init__(self, d_model: int, n_heads: int, gradient: ABSGradient):
+        self.linear1 = NormLayer(d_model)
+        self.attention = MultiHead(d_model, n_heads, gradient)
+        self.linear2 = NormLayer(d_model)
+        self.ff = FeedForward(d_model, gradient)
 
         self.gradient = gradient
 

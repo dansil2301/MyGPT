@@ -2,12 +2,12 @@ import numpy as np
 
 from NoTorchAI.Activation.Softmax import Softmax
 from NoTorchAI.Neuron import Neuron
+from NoTorchAI.Utils.Matrix import Matrix
 
 
 class CrossEntropy(Neuron):
-    def __init__(self, device: str = "cpu"):
-        super().__init__(device)
-        self.softmax = Softmax(device)
+    def __init__(self):
+        self.softmax = Softmax()
         self.p_logits = None
         self.targets = None
 
@@ -17,26 +17,26 @@ class CrossEntropy(Neuron):
         self.targets = targets
         
         x = logits - logits.max(axis=-1, keepdims=True)
-        exp = self.xp.exp(x)
+        exp = Matrix.exp(x)
         self.p_logits = exp / exp.sum(axis=-1, keepdims=True)
 
         p_correct = self.p_logits[
-            self.xp.arange(B)[:, None],
-            self.xp.arange(T)[None, :],
+            Matrix.arange(B)[:, None],
+            Matrix.arange(T)[None, :],
             targets
         ]
 
-        L = -self.xp.mean(self.xp.log(self.xp.clip(p_correct, 1e-10, 1.0)))
+        L = -Matrix.mean(Matrix.log(Matrix.clip(p_correct, 1e-10, 1.0)))
         return L
 
     def backward(self):
         B, T, V = self.p_logits.shape
 
-        grad = self.xp.copy(self.p_logits)
+        grad = Matrix.copy(self.p_logits)
 
         grad[
-            self.xp.arange(B)[:, None],
-            self.xp.arange(T)[None, :],
+            Matrix.arange(B)[:, None],
+            Matrix.arange(T)[None, :],
             self.targets
         ] -= 1
 

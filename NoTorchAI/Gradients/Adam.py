@@ -4,11 +4,11 @@ from NoTorchAI.Gradients.ABSGradient import ABSGradient
 from NoTorchAI.Layers.ABSLayer import ABSLayer
 from NoTorchAI.Layers.Embedding import Embedding
 from NoTorchAI.Neuron import Neuron
+from NoTorchAI.Utils.Matrix import Matrix
 
 
 class Adam(ABSGradient, Neuron):
-    def __init__(self, lr=3e-4, beta1=0.9, beta2=0.95, eps=1e-8, warmup_steps=0, min_lr=1e-6, device: str = "cpu"):
-        super().__init__(device)
+    def __init__(self, lr=3e-4, beta1=0.9, beta2=0.95, eps=1e-8, warmup_steps=0, min_lr=1e-6):
         self.lr = lr
         self.beta1 = beta1
         self.beta2 = beta2
@@ -35,7 +35,7 @@ class Adam(ABSGradient, Neuron):
             param = getattr(layer, param_name)
 
             clip_value = 1.0
-            grad_norm = self.xp.linalg.norm(grad)
+            grad_norm = Matrix.linalg_norm(grad)
 
             if grad_norm > clip_value:
                 grad = grad * (clip_value / (grad_norm + 1e-6))
@@ -43,8 +43,8 @@ class Adam(ABSGradient, Neuron):
             key = (id(layer), param_name)
 
             if key not in self.m:
-                self.m[key] = self.xp.zeros_like(grad)
-                self.v[key] = self.xp.zeros_like(grad)
+                self.m[key] = Matrix.zeros_like(grad)
+                self.v[key] = Matrix.zeros_like(grad)
 
             self.m[key] = self.beta1 * self.m[key] + (1 - self.beta1) * grad
             self.v[key] = self.beta2 * self.v[key] + (1 - self.beta2) * (grad ** 2)
@@ -57,6 +57,6 @@ class Adam(ABSGradient, Neuron):
                 v_hat = self.v[key] / (1 - self.beta2 ** self.t)
 
             lr = self.get_lr()
-            param -= lr * m_hat / (self.xp.sqrt(v_hat) + self.eps)
+            param -= lr * m_hat / (Matrix.sqrt(v_hat) + self.eps)
 
             setattr(layer, param_name, param)

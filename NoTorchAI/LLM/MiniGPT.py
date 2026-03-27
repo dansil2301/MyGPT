@@ -1,6 +1,7 @@
 import numpy as np
 
 from NoTorchAI.Activation.Softmax import Softmax
+from NoTorchAI.GlobalState.Device import Device
 from NoTorchAI.Neuron import Neuron
 from NoTorchAI.CrossEntropy import CrossEntropy
 from NoTorchAI.Gradients.ABSGradient import ABSGradient
@@ -8,21 +9,20 @@ from NoTorchAI.LLM.Block import Block
 from NoTorchAI.LLM.EmbeddingInitial import EmbeddingInitial
 from NoTorchAI.Layers.LinearLayer import Linear
 from NoTorchAI.Layers.NormLayer import NormLayer
+from NoTorchAI.Utils.Matrix import Matrix
 
 
 class MiniGPT(Neuron):
-    def __init__(self, vocab_size: int, d_model: int, block_size: int, n_layers: int, n_heads: int, gradient: ABSGradient, device: str = "cpu", quant: int = 16):
-        super().__init__(device)
+    def __init__(self, vocab_size: int, d_model: int, block_size: int, n_layers: int, n_heads: int, gradient: ABSGradient):
+        self.initial_embedding = EmbeddingInitial(vocab_size, d_model, block_size, gradient)
 
-        self.initial_embedding = EmbeddingInitial(vocab_size, d_model, block_size, gradient, device, quant)
+        self.blocks = [Block(d_model, n_heads, gradient) for _ in range(n_layers)]
 
-        self.blocks = [Block(d_model, n_heads, gradient, device, quant) for _ in range(n_layers)]
+        self.linear = NormLayer(d_model)
+        self.head = Linear(d_model, vocab_size)
+        self.cross_entropy = CrossEntropy()
 
-        self.linear = NormLayer(d_model, device, quant)
-        self.head = Linear(d_model, vocab_size, device, quant)
-        self.cross_entropy = CrossEntropy(device)
-
-        self.softmax = Softmax(device)
+        self.softmax = Softmax()
 
         self.block_size = block_size
 
@@ -81,13 +81,13 @@ class MiniGPT(Neuron):
 
             if temperature == 0:
                 # greedy decode
-                next_token = self.xp.argmax(logits[:, -1, :], axis=-1)
-                next_token = self.xp.expand_dims(next_token, axis=-1)
+                next_token = Matrix.argmax(logits[:, -1, :], axis=-1)
+                next_token = Matrix.expand_dims(next_token, axis=-1)
             else:
                 logits = logits[:, -1, :] / temperature
                 probs = self.softmax.forward(logits)
 
-                if self.device_str == "gpu":
+                if Device().device == "gpu":
                     probs = probs.get()  # cupy conversion
 
                 next_tokens = []
@@ -97,7 +97,6 @@ class MiniGPT(Neuron):
 
                 next_token = np.array(next_tokens).reshape(-1, 1)
 
-            print(idx.shape[1])
             idx = np.concatenate([idx, next_token], axis=1)
 
         return idx
