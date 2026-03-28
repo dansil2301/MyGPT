@@ -14,8 +14,16 @@ class Rake:
                 all_words.append(line.replace("\n", ""))
             return all_words
         
+    def _clean_words(self, text: str) -> List[str]:
+        PUNCT = ".,!?;:'\"()[]{} "
+
+        return [
+            word.strip(PUNCT)
+            for word in text.lower().split()
+        ]
+        
     def _get_candidates(self, text: str) -> List[str]:
-        spaced_text = text.split()
+        spaced_text = self._clean_words(text)
         splitted_text = []
 
         start_id = 0
@@ -30,7 +38,6 @@ class Rake:
 
                 start_id = i + 1
         
-       
         return splitted_text
     
     def _count_degree_freq(self, candidates: List[str]) -> dict:
@@ -48,7 +55,7 @@ class Rake:
         return word_scores
     
     def get_key_words(self, text: str):
-        candidates = self._get_candidates(text.lower())
+        candidates = self._get_candidates(text)
         word_scores = self._count_degree_freq(candidates)
         candiate_scores = {}
 
@@ -59,6 +66,6 @@ class Rake:
             candiate_scores[candidate] = score
 
         return candiate_scores
-
-rake = Rake()
-print(rake.get_key_words("The quick brown fox jumps over the lazy dog"))
+    
+    def add_stop_word(self, words: List[str]) -> None:
+        self.stop_words += words
