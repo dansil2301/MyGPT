@@ -9,7 +9,7 @@ from NoTorchAI.LLM.Block import Block
 from NoTorchAI.LLM.EmbeddingInitial import EmbeddingInitial
 from NoTorchAI.Layers.LinearLayer import Linear
 from NoTorchAI.Layers.NormLayer import NormLayer
-from NoTorchAI.Utils.Matrix import Matrix
+from NoTorchAI.Utils.MatrixOperations import MatrixOperations as mo
 
 
 class MiniGPT(Neuron):
@@ -81,8 +81,8 @@ class MiniGPT(Neuron):
 
             if temperature == 0:
                 # greedy decode
-                next_token = Matrix.argmax(logits[:, -1, :], axis=-1)
-                next_token = Matrix.expand_dims(next_token, axis=-1)
+                next_token = mo.argmax(logits[:, -1, :], axis=-1)
+                next_token = mo.expand_dims(next_token, axis=-1)
             else:
                 logits = logits[:, -1, :] / temperature
                 probs = self.softmax.forward(logits)

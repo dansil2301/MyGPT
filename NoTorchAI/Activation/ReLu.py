@@ -2,7 +2,7 @@ import numpy as np
 
 from NoTorchAI.Activation.ActivationFunc import ActivationFunc
 from NoTorchAI.Neuron import Neuron
-from NoTorchAI.Utils.Matrix import Matrix
+from NoTorchAI.Utils.MatrixOperations import MatrixOperations as mo
 
 
 class ReLu(ActivationFunc, Neuron):
@@ -11,7 +11,7 @@ class ReLu(ActivationFunc, Neuron):
 
     def forward(self, x):
         self.mask = (x > 0)  # store mask directly
-        return Matrix.where(self.mask, x, 0)
+        return mo.where(self.mask, x, 0)
 
     def backward(self, incoming_grad):
         return self.mask * incoming_grad

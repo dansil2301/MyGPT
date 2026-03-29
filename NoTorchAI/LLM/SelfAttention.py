@@ -3,7 +3,7 @@ from NoTorchAI.Neuron import Neuron
 from NoTorchAI.Activation.Softmax import Softmax
 from NoTorchAI.Layers.LinearLayer import Linear
 from NoTorchAI.Gradients.ABSGradient import ABSGradient
-from NoTorchAI.Utils.Matrix import Matrix
+from NoTorchAI.Utils.MatrixOperations import MatrixOperations as mo
 
 
 class SelfAttention(Neuron):
@@ -27,16 +27,16 @@ class SelfAttention(Neuron):
     def _forward_mask_fill(self, tensor: np.ndarray):
         B, T, _ = tensor.shape
 
-        mask = Matrix.triu(Matrix.ones((T, T), dtype=bool), k=1)
+        mask = mo.triu(mo.ones((T, T), dtype=bool), k=1)
         mask = mask[None, :, :]
-        tensor = Matrix.where(mask, -Matrix.inf, tensor)
+        tensor = mo.where(mask, -mo.inf, tensor)
         return tensor
     
     def _backward_mask_fill(self, grad: np.ndarray):
         B, T, _ = grad.shape
 
-        mask = Matrix.triu(Matrix.ones((T, T), dtype=bool), k=1)[None, :, :]
-        return Matrix.where(mask, 0, grad)
+        mask = mo.triu(mo.ones((T, T), dtype=bool), k=1)[None, :, :]
+        return mo.where(mask, 0, grad)
     
     def _change_weights(self):
         self.gradient_technic.step(self.query)
@@ -55,7 +55,7 @@ class SelfAttention(Neuron):
         masked_scores = self._forward_mask_fill(self.scores)
         self.attention = self.softmax.forward(masked_scores)
 
-        return Matrix.matmul(self.attention, self.v_output)
+        return mo.matmul(self.attention, self.v_output)
     
     def backward(self, incoming_grad: np.ndarray) -> np.ndarray:
         B, T, E = incoming_grad.shape

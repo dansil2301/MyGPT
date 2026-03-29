@@ -2,7 +2,7 @@ from NoTorchAI.Layers.Embedding import Embedding
 from NoTorchAI.Gradients import ABSGradient
 from NoTorchAI.Layers.ABSLayer import ABSLayer
 from NoTorchAI.Neuron import Neuron
-from NoTorchAI.Utils.Matrix import Matrix
+from NoTorchAI.Utils.MatrixOperations import MatrixOperations as mo
 
 
 class SGD(ABSGradient, Neuron):
@@ -15,7 +15,7 @@ class SGD(ABSGradient, Neuron):
         if self.step_count < self.warmup_steps:
             return self.base_lr * (self.step_count / self.warmup_steps)
         progress = (self.step_count - self.warmup_steps) / max(1, 5000 - self.warmup_steps)
-        return self.base_lr * 0.5 * (1 + Matrix.cos(Matrix.pi * progress))
+        return self.base_lr * 0.5 * (1 + mo.cos(mo.pi * progress))
 
     def step(self, layer: ABSLayer | Embedding) -> None:
         lr = self.get_lr()

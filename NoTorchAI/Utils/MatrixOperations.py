@@ -7,12 +7,16 @@ from NoTorchAI.GlobalState.Device import Device
 from NoTorchAI.GlobalState.Quant import Quant
 
 
-class Matrix:
-    xp = Device().set_module()
-    quant = Quant().set_quant()
+_xp = Device().set_module()
+_quant = Quant().set_quant()
 
-    pi = xp.pi
-    inf = xp.inf
+
+class MatrixOperations:
+    xp = _xp
+    quant = _quant
+
+    pi: float = float(np.pi)
+    inf: float = float(np.inf)
 
     @classmethod
     def xavier_init(cls, x: int, y: int) -> np.ndarray | cp.ndarray:
@@ -67,7 +71,7 @@ class Matrix:
         return cls.xp.expand_dims(x, axis=axis)
     
     @classmethod
-    def add_at(cls, x: np.ndarray | cp.ndarray, y: np.ndarray | cp.ndarray, z: np.ndarray | cp.ndarray,) -> np.ndarray | cp.ndarray:
+    def add_at(cls, x, y, z) -> None:
         cls.xp.add.at(x, y, z)
     
     @classmethod
@@ -103,11 +107,11 @@ class Matrix:
         return cls.xp.matmul(x, y)
 
     @classmethod
-    def arange(cls, x: np.ndarray | cp.ndarray) -> np.ndarray | cp.ndarray:
+    def arange(cls, x: int) -> np.ndarray | cp.ndarray:
         return cls.xp.arange(x)
     
     @classmethod
-    def concatenate(cls, arrays: tuple[list[np.ndarray | cp.ndarray], np.ndarray | cp.ndarray], axis: int = 0) -> np.ndarray | cp.ndarray:
+    def concatenate(cls, arrays: list[np.ndarray | cp.ndarray], axis: int = 0) -> np.ndarray | cp.ndarray:
         return cls.xp.concatenate(arrays, axis=axis)
     
     @classmethod
@@ -115,7 +119,7 @@ class Matrix:
         return cls.xp.copy(x)
     
     @classmethod
-    def convert_to_xp(cls, array: List[any]) -> np.ndarray | cp.ndarray:
+    def convert_to_xp(cls, array: List[Any]) -> np.ndarray | cp.ndarray:
         return cls.xp.array(array)
     
     @classmethod

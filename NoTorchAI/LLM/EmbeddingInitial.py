@@ -3,7 +3,7 @@ import numpy as np
 from NoTorchAI.Layers.Embedding import Embedding
 from NoTorchAI.Gradients.ABSGradient import ABSGradient
 from NoTorchAI.Neuron import Neuron
-from NoTorchAI.Utils.Matrix import Matrix
+from NoTorchAI.Utils.MatrixOperations import MatrixOperations as mo
 
 
 class EmbeddingInitial(Neuron):
@@ -20,7 +20,7 @@ class EmbeddingInitial(Neuron):
         B, T = x.shape  
 
         token_emb = self.token_embedding.forward(x)
-        pos_ids = Matrix.arange(T)
+        pos_ids = mo.arange(T)
         pos_emb = self.position_embedding.forward(pos_ids)
 
         x = token_emb + pos_emb  
@@ -29,7 +29,7 @@ class EmbeddingInitial(Neuron):
     
     def backward(self, incoming_grad: np.ndarray) -> None:
         d_token = incoming_grad
-        d_pos = Matrix.sum(incoming_grad, axis=0)
+        d_pos = mo.sum(incoming_grad, axis=0)
         
         self.token_embedding.backward(d_token)
         self.position_embedding.backward(d_pos)

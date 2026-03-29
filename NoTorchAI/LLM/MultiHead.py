@@ -6,7 +6,7 @@ from NoTorchAI.Gradients.ABSGradient import ABSGradient
 from NoTorchAI.LLM.SelfAttention import SelfAttention
 from NoTorchAI.Layers.LinearLayer import Linear
 from NoTorchAI.Neuron import Neuron
-from NoTorchAI.Utils.Matrix import Matrix
+from NoTorchAI.Utils.MatrixOperations import MatrixOperations as mo
 
 
 class MultiHead(Neuron):
@@ -30,7 +30,7 @@ class MultiHead(Neuron):
             x_head = x[:, :, self.d_head * i : self.d_head * (i + 1)]
             results_heads.append(head.forward(x_head))
 
-        concatinated = Matrix.concatenate(results_heads, axis=2)
+        concatinated = mo.concatenate(results_heads, axis=2)
 
         output = self.linear1.forward(concatinated)
         return output
@@ -44,7 +44,7 @@ class MultiHead(Neuron):
             grad_head = grad[:, :, self.d_head * i : self.d_head * (i + 1)]
             grads_heads.append(head.backward(grad_head))
 
-        grad = Matrix.concatenate(grads_heads, axis=2)
+        grad = mo.concatenate(grads_heads, axis=2)
 
         self._change_weights()
         return grad
