@@ -2,6 +2,7 @@ import cupy as cp
 import numpy as np
 
 from NoTorchAI.GlobalState.Device import Device
+from NoTorchAI.GlobalState.Quant import Quant
 
 
 class Neuron:
@@ -13,11 +14,10 @@ class Neuron:
         saved[c_cls_name] = {}
 
         for attr_name in self.__dict__:
-            if attr_name in ['xp', 'device']:
-                continue
             if isinstance(self.__dict__[attr_name], Neuron):
                 saved[c_cls_name][attr_name] = {}
                 saved[c_cls_name][attr_name] = self.__dict__[attr_name]._save(saved[c_cls_name][attr_name])
+
             elif isinstance(self.__dict__[attr_name], list):
                 ls = self.__dict__[attr_name]
                 if ls and isinstance(ls[0], Neuron):
@@ -25,6 +25,7 @@ class Neuron:
                         if attr_name not in saved[c_cls_name]:
                             saved[c_cls_name][attr_name] = []
                         saved[c_cls_name][attr_name].append(neuron._save({}))
+
             else:
                 saved[c_cls_name][attr_name] = self.__dict__[attr_name]
 
@@ -66,6 +67,7 @@ class Neuron:
                     setattr(c_class_impl, el, instance)
                 else:
                     setattr(c_class_impl, el, saved[el])
+
             # check if array element is an element of a folded Neuron
             elif isinstance(saved[el], list):
                 new_ls = []
@@ -78,9 +80,7 @@ class Neuron:
                     else:
                         new_ls.append(ls_el)
                 setattr(c_class_impl, el, new_ls)
-            # covert cupy to numpy to run model on CPU by default
-            elif isinstance(saved[el], cp.ndarray):
-                setattr(c_class_impl, el, saved[el].get())
+
             # if not Neuron just save the value to the variable
             else:
                 setattr(c_class_impl, el, saved[el])
