@@ -1,8 +1,8 @@
 import cupy as cp
 import numpy as np
+import types
 
 from NoTorchAI.GlobalState.Device import Device
-from NoTorchAI.GlobalState.Quant import Quant
 
 
 class Neuron:
@@ -14,12 +14,17 @@ class Neuron:
         saved[c_cls_name] = {}
 
         for attr_name in self.__dict__:
-            if isinstance(self.__dict__[attr_name], Neuron):
-                saved[c_cls_name][attr_name] = {}
-                saved[c_cls_name][attr_name] = self.__dict__[attr_name]._save(saved[c_cls_name][attr_name])
+            value = self.__dict__[attr_name]
 
-            elif isinstance(self.__dict__[attr_name], list):
-                ls = self.__dict__[attr_name]
+            if attr_name in ("device", "xp", "device_str") or isinstance(value, types.ModuleType):
+                continue
+
+            if isinstance(value, Neuron):
+                saved[c_cls_name][attr_name] = {}
+                saved[c_cls_name][attr_name] = value._save(saved[c_cls_name][attr_name])
+
+            elif isinstance(value, list):
+                ls = value
                 if ls and isinstance(ls[0], Neuron):
                     for neuron in ls:
                         if attr_name not in saved[c_cls_name]:
@@ -27,7 +32,7 @@ class Neuron:
                         saved[c_cls_name][attr_name].append(neuron._save({}))
 
             else:
-                saved[c_cls_name][attr_name] = self.__dict__[attr_name]
+                saved[c_cls_name][attr_name] = value
 
         return saved
     
@@ -89,7 +94,7 @@ class Neuron:
 
     def save(self, path: str) -> None:
         saved = self._save()
-        np.savez(path + ".npz", arr_0=saved)
+        np.savez(path + ".npz", arr_0=saved, allow_pickle=True)
 
     def load(self, path: str):
         archive = np.load(path + ".npz", allow_pickle=True)
