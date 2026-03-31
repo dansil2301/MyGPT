@@ -70,33 +70,3 @@ class MiniGPT(Neuron):
 
         self.initial_embedding.backward(grad)
         self._change_weights()
-
-
-    def generate(self, idx, max_tokens, temperature: float = 0.9):
-        next_tokens = []
-        while idx.shape[1] <= max_tokens:
-            idx_cond = idx[:, -self.block_size:]
-
-            logits, _ = self.forward(idx_cond)
-
-            if temperature == 0:
-                # greedy decode
-                next_token = mo.argmax(logits[:, -1, :], axis=-1)
-                next_token = mo.expand_dims(next_token, axis=-1)
-            else:
-                logits = logits[:, -1, :] / temperature
-                probs = self.softmax.forward(logits)
-
-                if Device().device == "gpu":
-                    probs = probs.get()  # cupy conversion
-
-                next_tokens = []
-                for b in range(probs.shape[0]):
-                    next_token = np.random.choice(probs.shape[-1], p=probs[b])
-                    next_tokens.append(next_token)
-
-                next_token = np.array(next_tokens).reshape(-1, 1)
-
-            idx = np.concatenate([idx, next_token], axis=1)
-
-        return idx

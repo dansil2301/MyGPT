@@ -91,6 +91,10 @@ class MatrixOperations:
         return cls.xp.cos(x)
     
     @classmethod
+    def all(cls, x: np.ndarray | cp.ndarray):
+        return cls.xp.all(x)
+
+    @classmethod
     def where(cls, mask: np.ndarray | cp.ndarray, x: np.ndarray | cp.ndarray, choice: Any):
         return cls.xp.where(mask, x, choice)
     
@@ -118,6 +122,10 @@ class MatrixOperations:
     def copy(cls, x: np.ndarray | cp.ndarray) -> np.ndarray | cp.ndarray:
         return cls.xp.copy(x)
     
+    @classmethod
+    def choice(cls, a: int, p: np.ndarray | cp.ndarray, size: int = 1):
+        return cls.xp.random.choice(a=a, p=p, size=size)
+
     @classmethod
     def convert_to_xp(cls, array: List[Any]) -> np.ndarray | cp.ndarray:
         return cls.xp.array(array)
