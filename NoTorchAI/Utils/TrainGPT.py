@@ -7,7 +7,6 @@ from tokenizers import Tokenizer
 from tokenizers.decoders import ByteLevel
 
 from NoTorchAI.GlobalState.Device import Device
-from NoTorchAI.GlobalState.Quant import Quant
 from NoTorchAI.Gradients.ABSGradient import ABSGradient
 from NoTorchAI.Neuron import Neuron
 from NoTorchAI.Utils.Batch import Batch
