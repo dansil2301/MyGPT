@@ -33,6 +33,23 @@ class TrainGPT:
         self.logs_path = Path(__file__).parent.parent.parent.resolve() / "logs" / f"{timestamp}.csv"
         self.logs = pd.DataFrame(columns=["step", "lr", "loss", "ema_loss"])
 
+    def _mask_instructions(self, x: np.ndarray) -> np.ndarray | None:
+        assistant_token = self.tokenizer.encode("<|assistant|>").ids[0]
+        
+        batch_size, seq_len = x.shape
+        mask = mo.ones((batch_size, seq_len))
+        
+        for i in range(batch_size):
+            indices = mo.where(x[i] == assistant_token)[0]
+            
+            if indices.size == 0:
+                continue
+            
+            assistant_pos = indices[0]
+            mask[i, :assistant_pos+1] = 0
+        
+        return mask
+
     def _generate_idx(self, idx: np.ndarray, max_tokens: int, temperature: float = 0.9) -> np.ndarray:
         while idx.shape[1] <= max_tokens:
             idx_cond = idx[:, -self.block_size:]
@@ -72,7 +89,14 @@ class TrainGPT:
         for step in range(start_step, end_step):
             xb, yb = self.batch.get_batch(self.block_size, self.batch_size)
 
+            xb = mo.convert_to_xp(xb)
+            yb = mo.convert_to_xp(yb)
+
             _, loss = self.model.forward(xb, yb)
+
+            mask = self._mask_instructions(xb)
+
+            loss = (loss * mask).sum() / (mask.sum() + 1e-8)
 
             self.gradient.t += 1
             self.model.backward()

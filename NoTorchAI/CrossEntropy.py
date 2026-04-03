@@ -11,7 +11,7 @@ class CrossEntropy(Neuron):
         self.p_logits = None
         self.targets = None
 
-    def forward(self, logits: np.ndarray, targets: np.ndarray):
+    def forward(self, logits: np.ndarray, targets: np.ndarray) -> np.ndarray:
         B, T, V = logits.shape
 
         self.targets = targets
@@ -26,7 +26,8 @@ class CrossEntropy(Neuron):
             targets
         ]
 
-        L = -mo.mean(mo.log(mo.clip(p_correct, 1e-10, 1.0)))
+        # Returns per token training handles proper transformation
+        L = -mo.log(mo.clip(p_correct, 1e-10, 1.0))
         return L
 
     def backward(self):

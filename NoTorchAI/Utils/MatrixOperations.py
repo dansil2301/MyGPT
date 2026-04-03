@@ -95,7 +95,9 @@ class MatrixOperations:
         return cls.xp.all(x)
 
     @classmethod
-    def where(cls, mask: np.ndarray | cp.ndarray, x: np.ndarray | cp.ndarray, choice: Any):
+    def where(cls, mask: np.ndarray | cp.ndarray, x: np.ndarray | cp.ndarray = None, choice: Any = None):
+        if x is None and choice is None:
+            return cls.xp.nonzero(mask)
         return cls.xp.where(mask, x, choice)
     
     @classmethod
