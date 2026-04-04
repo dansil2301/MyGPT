@@ -25,19 +25,21 @@ class KNN:
         # build clusters
         clusters = {i: [] for i in range(len(centroids))}
         for idx, cid in enumerate(cluster_ids):
-            clusters[cid].append(embeddings[idx])
+            clusters[cid].append(idx)
 
         return clusters
     
     @classmethod
-    def new_centroids(cls, clusters: dict[np.ndarray], embeddings: np.ndarray) -> List:
+    def _new_centroids(cls, clusters: dict, embeddings: np.ndarray):
         centroids = []
+
         for cluster in clusters.values():
             if len(cluster) == 0:
-                centroids.append(np.random.randn(embeddings.shape[1]))
+                centroids.append(embeddings[np.random.randint(len(embeddings))])
             else:
-                centroids.append(np.mean(cluster, axis=0))
-        
+                points = embeddings[cluster]
+                centroids.append(np.mean(points, axis=0))
+
         return np.array(centroids)
 
     @classmethod
@@ -49,6 +51,6 @@ class KNN:
         while not np.allclose(prev_centroids, centroids):
             prev_centroids = centroids.copy()
             clusters = cls._clustering(centroids, embeddings)
-            centroids = cls.new_centroids(clusters, embeddings)
+            centroids = cls._new_centroids(clusters, embeddings)
 
-        return clusters
+        return clusters, centroids
