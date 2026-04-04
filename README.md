@@ -1,100 +1,117 @@
 # MyGPT
 
-**A minimal Transformer‑based language model built from scratch using only NumPy.**
+This is a project where I'm building and experimenting with language models from the ground up. Started as a way to understand how transformers work without relying on big libraries like PyTorch, but it's grown into a full setup with custom training code, some trained models, and data processing pipelines.
 
-This repository is an educational playground for anyone who wants to learn how modern large language
-models work under the hood. Instead of relying on PyTorch, TensorFlow, or any deep‑learning
-framework, every component—from embeddings and self‑attention to layer normalization and the
-training loop—is implemented manually using basic linear algebra operations.
-
-> ⚠️ This code is designed for clarity and learning. It’s **not** optimized for performance or
-> production use.
+The core is the NoTorchAI library, which implements all the neural network bits using just NumPy/Cupy. I've used it to train models on stories and instructions, and there are notebooks for training, text processing, and testing things out.
 
 ---
 
-## 🔧 Project Structure
+## Project Structure
 
 ```
-NoTorchAI/                 # core library modules
-  ActivationFunc.py
-  CrossEntropy.py
-  Embedding.py
-  Gradients/               # optimizers
-    ABSGradient.py
-    SGD.py
-    Adam.py
-  Layers/                  # building blocks
-    ABSLayer.py
-    LinearLayer.py
-    NormLayer.py
-  LLM/                     # transformer components
-    EmbeddingInitial.py
-    SelfAttention.py
-    FeedForward.py
-    Block.py
-    MiniGPT.py             # small GPT‑style model
-
-*.ipynb                   # notebooks for training and experiments
-requirements.txt          # Python dependencies (mostly numpy)
-README.md                 # you are reading it right now
+MyGPT/
+├── NoTorchAI/                 # Custom AI framework built with NumPy
+│   ├── Activation/
+│   │   ├── ActivationFunc.py
+│   │   ├── ReLu.py
+│   │   └── Softmax.py
+│   ├── GlobalState/
+│   │   ├── Device.py
+│   │   └── Quant.py
+│   ├── Gradients/
+│   │   ├── ABSGradient.py
+│   │   ├── Adam.py
+│   │   └── SGD.py
+│   ├── Layers/
+│   │   ├── ABSLayer.py
+│   │   ├── Embedding.py
+│   │   ├── LinearLayer.py
+│   │   └── NormLayer.py
+│   ├── LLM/
+│   │   ├── Block.py
+│   │   ├── EmbeddingInitial.py
+│   │   ├── FeedForward.py
+│   │   ├── MiniGPT.py
+│   │   ├── MultiHead.py
+│   │   └── SelfAttention.py
+│   ├── NLP/
+│   │   ├── childern_stories_embeddings.npy
+│   │   ├── KeyBERT.py
+│   │   ├── Rake.py
+│   │   └── StopWords.txt
+│   ├── Stats/
+│   │   ├── KNN.py
+│   │   └── PCA.py
+│   ├── Utils/
+│   │   ├── Batch.py
+│   │   ├── MatrixOperations.py
+│   │   └── TrainGPT.py
+│   ├── CrossEntropy.py
+│   └── Neuron.py
+├── No_Torch_Training.ipynb    # Training notebook
+├── Pipeline_text_transformation.ipynb  # Text processing notebook
+├── test.py                    # Test script
+├── requirements.txt           # Dependencies
+├── README.md                  # This file
+└── challenges.md              # My journey a bit more detailed
 ```
 
-The `NoTorchAI` package contains everything needed to instantiate, train, and sample from a
-MiniGPT‑style model; the notebooks demonstrate how to wire the pieces together.
+The NoTorchAI folder has all the building blocks for the models. The notebooks show how to use everything.
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
-1. **Clone the repository**
+1. **Grab the code**
    ```bash
-   git clone https://github.com/<your‑username>/MyGPT.git
+   git clone https://github.com/dansil2301/MyGPT.git
    cd MyGPT
    ```
 
-2. **Create a virtual environment and install dependencies**
+2. **Set up the environment**
    ```bash
    python -m venv .venv
-   source .venv/bin/activate   # Linux/macOS
-   # or .\.venv\Scripts\activate on Windows
+   source .venv/bin/activate   # On Linux/Mac
+   # Or .\.venv\Scripts\activate on Windows
    pip install -r requirements.txt
    ```
 
-3. **Run one of the provided notebooks**
+3. **Check out the notebooks**
 
-   - `No_Torch_Training.ipynb` – train the NumPy‑only model from scratch
-   - `Torch_Training.ipynb` – reference implementation using PyTorch for comparison
-   - `Pipeline_text_transformation.ipynb` – simple text preprocessing/augmentation examples
+   - `No_Torch_Training.ipynb` - Trains a model from scratch using the custom framework
+   - `Pipeline_text_transformation.ipynb` - Handles text preprocessing and transformations
 
-   Open them with Jupyter:
+   Fire up Jupyter to run them:
    ```bash
    jupyter notebook
    ```
 
-4. **Use the library programmatically**
+4. **Use the code directly**
 
-   Import classes from `NoTorchAI` in your own scripts:
+   Pull in the classes from NoTorchAI for your own scripts:
 
    ```python
    from NoTorchAI.LLM.MiniGPT import MiniGPT
-   from NoTorchAI.Gradients.SGD import SGD
-   from NoTorchAI.CrossEntropy import CrossEntropy
+   from NoTorchAI.Gradients.Adam import Adam
    ```
 
-   Assemble a model, loss, and optimizer, then loop over batches of data just as you would
-   in a deep‑learning tutorial.
+   Build your model, pick an optimizer, and train on your data.
 
-5. **Generate text**
+5. **Generate some text**
 
-   After training, call the model’s `generate` method (see notebooks) to sample continuations from
-a prompt.
+   Once trained, use the model's generate method to create text from prompts. Check the notebooks for examples.
 
 ---
 
-## ✏️ Features
+## What's Included
 
-- Pure NumPy implementation, no external ML frameworks
-- Core Transformer components: embedding, self‑attention, feed‑forward, layer norm
-- Custom gradient and optimizer classes (SGD, Adam)
-- Simple cross‑entropy loss and text generation routines
-- Educational Jupyter notebooks demonstrating training and usage
+- **Custom AI Framework**: All neural net components in NumPy - embeddings, attention, layers, you name it.
+- **Trained Models**: Saved models like story_instruct_model.npz for generating stories or following instructions.
+- **Data Processing**: Tools for handling text, tokenizers, and embeddings.
+- **Training Tools**: Optimizers (SGD, Adam), loss functions, and batch processing.
+- **Notebooks**: Hands-on examples for training and text work.
+- **Logs and Tests**: Training history and a test script to verify things.
+
+This is all about learning and experimenting, not production-ready code. Performance isn't optimized, but it's great for understanding the internals. 
+
+At least helped me :)
