@@ -106,7 +106,7 @@ The NoTorchAI folder has all the building blocks for the models. The notebooks s
 ## What's Included
 
 - **Custom AI Framework**: All neural net components in NumPy - embeddings, attention, layers, you name it.
-- **Saving**: Custom model saving so that one should lose progress of training.
+- **Saving**: Custom model saving so that one will not lose progress of training.
 - **Data Processing**: Tools for handling text, tokenizers, and embeddings.
 - **Training Tools**: Optimizers (SGD, Adam), loss functions, and batch processing.
 - **Notebooks**: Hands-on examples for training and text work.
