@@ -1,3 +1,4 @@
+from collections import Counter
 from datetime import datetime
 from pathlib import Path
 
@@ -50,7 +51,7 @@ class TrainGPT:
         
         return mask
 
-    def _generate_idx(self, idx: np.ndarray, max_tokens: int, temperature: float = 0.9) -> np.ndarray:
+    def _generate_idx(self, idx: np.ndarray, max_tokens: int, temperature: float = 0.9, repetition_penalty: float = 1.2) -> np.ndarray:
         while idx.shape[1] <= max_tokens:
             idx_cond = idx[:, -self.block_size:]
             logits, _ = self.model.forward(idx_cond)
@@ -60,6 +61,18 @@ class TrainGPT:
                 next_token = mo.expand_dims(next_token, axis=-1)
             else:
                 logits = logits[:, -1, :] / temperature
+
+                for b in range(idx.shape[0]):
+                    counts = Counter(idx[b].tolist())
+
+                    for token, count in counts.items():
+                        factor = repetition_penalty ** count
+
+                        if logits[b, token] > 0:
+                            logits[b, token] /= factor
+                        else:
+                            logits[b, token] *= factor
+
                 probs = self.model.softmax.forward(logits)
 
                 next_tokens = []
@@ -75,10 +88,10 @@ class TrainGPT:
 
         return idx
 
-    def generate_str(self, prompt: str, max_tokens: int, temperature: float = 0.9) -> str:
+    def generate_str(self, prompt: str, max_tokens: int, temperature: float = 0.9, repetition_penalty: float = 1.2) -> str:
         encoded = self.tokenizer.encode(prompt).ids
         context = self.xp.array(encoded, dtype=self.xp.int32).reshape(1, -1)
-        generated = self._generate_idx(context, max_tokens, temperature)
+        generated = self._generate_idx(context, max_tokens, temperature, repetition_penalty)
         return self.tokenizer.decode(generated[0].tolist())
 
     def train(self, prompt: str, max_tokens: int, temperature: float = 0.9, 
